@@ -1,0 +1,53 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: iiot-postgres
+    environment:
+      POSTGRES_USER: iiot_user
+      POSTGRES_PASSWORD: 135790
+      POSTGRES_DB: industrial_iiot_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_iiot:/var/lib/postgresql/data
+    networks:
+      - iiot-network
+
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: iiot-mqtt-broker
+    ports:
+      - "1883:1883" #Standard MQTT protocol port
+      - "9001:9001" #WebSockets port
+    volumes:
+      - ./infra/mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - mosquitto_data:/mosquitto/data
+      - mosquitto_log:/mosquitto/log
+    networks:
+      - iiot-network
+
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: iiot-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: iiot
+      RABBITMQ_DEFAULT_PASS: iiot
+    volumes:
+      - rabbitmq_lib:/var/lib/rabbitmq/
+      - rabbitmq_log:/var/log/rabbitmq
+    networks:
+      - iiot-network
+
+networks:
+  iiot-network:
+    driver: bridge
+
+volumes:
+  postgres_iiot:
+  mosquitto_data:
+  mosquitto_log:
+  rabbitmq_lib:
+  rabbitmq_log:
