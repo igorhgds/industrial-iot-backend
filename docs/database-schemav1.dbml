@@ -1,0 +1,163 @@
+// ==========================================
+// ESTRUTURA DE BANCO DE DADOS IIOT / INDUSTRIA 4.0
+// ==========================================
+
+// Enums definition
+Enum user_role {
+  OPERATOR
+  TECHNICIAN
+  MANAGER
+  ADMIN
+}
+
+Enum equipment_type {
+  MOTOR
+  HVAC
+  LIGHTING
+  CONVEYOR
+  COMPRESSOR
+}
+
+Enum equipment_status {
+  ACTIVE
+  MAINTENANCE
+  INACTIVE
+}
+
+Enum sensor_type {
+  CURRENT
+  VOLTAGE
+  TEMPERATURE
+  VIBRATION
+  ACTUATOR
+}
+
+Enum sensor_status {
+  ONLINE
+  OFFLINE
+  ERROR
+}
+
+Enum alert_severity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+Enum alert_status {
+  PENDING
+  ACKNOWLEDGED
+  RESOLVED
+}
+
+Enum work_order_priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+Enum work_order_status {
+  OPEN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+Enum rule_condition {
+  GREATER_THAN
+  LESS_THAN
+  EQUALS
+}
+
+Enum rule_action_type {
+  TOGGLE_ACTUATOR
+  TRIGGER_LIGHT_ALERT
+  SEND_EMAIL
+}
+
+// Tables definition
+Table sectors {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar [not null, note: 'Ex: Pátio Fabril, Linha A, HVAC']
+  description text
+  created_at timestamp [default: `now()`]
+}
+
+Table users {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar [not null]
+  email varchar [unique, not null]
+  password_hash varchar [not null]
+  role user_role [not null, default: 'OPERATOR']
+  sector_id uuid [ref: > sectors.id]
+  created_at timestamp [default: `now()`]
+}
+
+Table equipments {
+  id uuid [pk, default: `gen_random_uuid()`]
+  code varchar [unique, not null, note: 'Tag industrial. Ex: MOT-101, HVAC-02']
+  name varchar [not null]
+  type equipment_type [not null]
+  status equipment_status [default: 'ACTIVE']
+  sector_id uuid [ref: > sectors.id]
+  created_at timestamp [default: `now()`]
+}
+
+Table sensors {
+  id uuid [pk, default: `gen_random_uuid()`]
+  equipment_id uuid [ref: > equipments.id]
+  code varchar [not null, note: 'Ex: SENS-TEMP-01, SENS-VIB-02']
+  sensor_type sensor_type [not null]
+  unit_of_measure varchar [note: 'A, V, °C, mm/s, BINARY']
+  min_threshold float [note: 'Limite mínimo para alerta']
+  max_threshold float [note: 'Limite máximo para alerta']
+  status sensor_status [default: 'ONLINE']
+  mqtt_topic varchar [note: 'Tópico do broker MQTT para escuta do sensor']
+  created_at timestamp [default: `now()`]
+}
+
+Table telemetry_data {
+  id uuid [pk, default: `gen_random_uuid()`]
+  sensor_id uuid [ref: > sensors.id]
+  timestamp timestamp [not null, default: `now()`]
+  value float [not null]
+  raw_payload text [note: 'Payload JSON original enviado pelo gateway/ESP32']
+}
+
+Table alerts {
+  id uuid [pk, default: `gen_random_uuid()`]
+  equipment_id uuid [ref: > equipments.id]
+  sensor_id uuid [ref: > sensors.id]
+  severity alert_severity [not null]
+  message text [not null]
+  value_at_trigger float [not null]
+  status alert_status [default: 'PENDING']
+  acknowledged_by uuid [ref: > users.id]
+  triggered_at timestamp [default: `now()`]
+  resolved_at timestamp
+}
+
+Table work_orders {
+  id uuid [pk, default: `gen_random_uuid()`]
+  alert_id uuid [ref: > alerts.id, note: 'Nulo se for OS manual']
+  equipment_id uuid [ref: > equipments.id]
+  assigned_to uuid [ref: > users.id]
+  title varchar [not null]
+  description text
+  priority work_order_priority [default: 'MEDIUM']
+  status work_order_status [default: 'OPEN']
+  created_at timestamp [default: `now()`]
+  closed_at timestamp
+}
+
+Table automation_rules {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar [not null, note: 'Ex: Ligar exaustor ao exceder 50°C']
+  input_sensor_id uuid [ref: > sensors.id]
+  condition rule_condition [not null]
+  threshold_value float [not null]
+  action_type rule_action_type [not null]
+  target_sensor_id uuid [ref: > sensors.id, note: 'Sensor/Atuador alvo da ação']
+  is_active boolean [default: true]
+}
