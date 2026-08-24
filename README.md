@@ -14,7 +14,7 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
 
 ## 📌 Architectural Principles
 
-- **Event-Driven Architecture (EDA):** High-throughput, asynchronous sensor ingestion and bi-directional actuation using Mosquitto (MQTT) and RabbitMQ (AMQP).
+- **Event-Driven Architecture (EDA):** Dual-broker strategy utilizing **Mosquitto (MQTT)** for lightweight real-time telemetry ingestion and actuation, and **RabbitMQ (AMQP)** for transactional, guaranteed delivery of critical anomaly alerts and maintenance work orders (Ordens de Serviço).
 - **Clean & Hexagonal Architecture:** Strict Separation of Concerns. Core domain business logic is decoupled from frameworks, ensuring testability and longevity.
 - **Quality Assurance & Verification:** Comprehensive unit and integration test coverage using JUnit 5, Mockito, and Testcontainers.
 - **Container-First Environment:** 100% conteinerized local environment managed via Docker Compose.
@@ -30,34 +30,36 @@ graph TD
     end
 
     subgraph msg_broker ["Messaging Broker Layer"]
-        MQTT["Mosquitto Broker (MQTT :1883 / WS :9001)"]
-        RMQ["RabbitMQ Broker (AMQP :5672 / Mgmt :15672)"]
+        MQTT["📡 Mosquitto MQTT Broker (MQTT :1883 / WS :9001)<br/>[Telemetry Ingestion & Actuation]"]
+        RMQ["🐇 RabbitMQ AMQP Broker (AMQP :5672 / Mgmt :15672)<br/>[Critical Alerts & Work Orders]"]
     end
 
     subgraph backend_core ["Backend Core (Spring Boot 3.4 / Java 21)"]
-        ING["Telemetry Ingestion Consumer"]
-        UC["Clean Architecture Use Cases (ProcessTelemetryUseCase)"]
-        HVAC["HVAC Thermal Controller Module"]
+        ING["📥 Telemetry Ingestion Consumer"]
+        UC["⚙️ Clean Architecture Use Cases (ProcessTelemetryUseCase)"]
+        HVAC["🌡️ HVAC Thermal Controller Module"]
+        ALERT["🚨 Alert & Work Order Dispatcher"]
     end
 
     subgraph persistence ["Persistence & Storage"]
-        PG[("PostgreSQL 16 DB (industrial_iiot_db)")]
-        FLY["Flyway Migrations"]
+        PG[("🐘 PostgreSQL 16 DB (industrial_iiot_db)")]
+        FLY["✈️ Flyway Migrations"]
     end
 
     subgraph frontend_layer ["Web & Frontend Layer"]
-        ANG["Angular Real-Time Dashboard (WebSockets / SSE)"]
+        ANG["🅰️ Angular Real-Time Dashboard (WebSockets / SSE)"]
     end
 
-    MS -->|Publish JSON Telemetry| MQTT
-    MQTT -->|Bridge / Route| RMQ
-    RMQ -->|Consume Payload| ING
+    MS -->|1. Publish MQTT Telemetry| MQTT
+    MQTT -->|2. Consume Sensor Stream| ING
     ING --> UC
-    UC -->|Save Readings & Anomalies| PG
+    UC -->|3. Save Telemetry Readings| PG
     FLY -.->|Schema Versioning| PG
-    UC -->|Trigger Thermal Rule| HVAC
-    HVAC -->|Bi-Directional Command| MQTT
-    UC -->|Real-Time Stream| ANG
+    UC -->|4. Detect Anomaly & Trigger Alert| ALERT
+    ALERT -->|5. Publish Guaranteed Event| RMQ
+    UC -->|6. Thermal Management Rule| HVAC
+    HVAC -->|7. Actuation Command| MQTT
+    UC -->|8. Real-Time Stream| ANG
 ```
 
 ---
