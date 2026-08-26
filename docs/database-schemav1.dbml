@@ -96,8 +96,7 @@ Table users {
 
 Table equipments {
   id uuid [pk, default: `gen_random_uuid()`]
-  code varchar [unique, not null, note: 'Tag industrial. Ex: MOT-101, HVAC-02']
-  name varchar [not null]
+  equip_code varchar [unique, not null, note: 'Tag industrial. Ex: MOT-101, HVAC-02']
   type equipment_type [not null]
   status equipment_status [default: 'ACTIVE']
   sector_id uuid [ref: > sectors.id]
