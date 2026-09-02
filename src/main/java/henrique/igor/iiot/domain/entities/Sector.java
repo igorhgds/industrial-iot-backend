@@ -5,16 +5,13 @@ import java.util.UUID;
 
 public class Sector {
 
-    private UUID sectorId;
-    private String name;
+    private final UUID sectorId;
+    private final String name;
     private String description;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public Sector(String name, String description) {
-        this.sectorId = UUID.randomUUID();
-        this.name = name;
-        this.description = description;
-        this.createdAt = LocalDateTime.now();
+        this(UUID.randomUUID(), name, description, LocalDateTime.now());
     }
 
     public Sector(UUID sectorId, String name, String description, LocalDateTime createdAt) {

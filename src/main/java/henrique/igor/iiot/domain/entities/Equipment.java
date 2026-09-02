@@ -8,20 +8,15 @@ import java.util.UUID;
 
 public class Equipment {
 
-    private UUID equipmentId;
-    private String equipCode;
+    private final UUID equipmentId;
+    private final String equipCode;
     private EquipType type;
     private EquipStatus status;
     private Sector sector;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public Equipment(String equipCode, EquipType type, EquipStatus status, Sector sector) {
-        this.equipmentId = UUID.randomUUID();
-        this.equipCode = equipCode;
-        this.type = type;
-        this.status = status;
-        this.sector = sector;
-        this.createdAt = LocalDateTime.now();
+        this(UUID.randomUUID(), equipCode, type, status, sector, LocalDateTime.now());
     }
 
     public Equipment(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, Sector sector, LocalDateTime createdAt) {

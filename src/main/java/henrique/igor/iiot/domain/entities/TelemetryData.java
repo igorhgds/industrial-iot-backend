@@ -6,18 +6,14 @@ import java.util.UUID;
 
 public class TelemetryData {
 
-    private UUID telemetryId;
-    private LocalDateTime timestamp;
-    private BigDecimal value;
-    private String rawPayload;
-    private Sensor sensor;
+    private final UUID telemetryId;
+    private final LocalDateTime timestamp;
+    private final BigDecimal value;
+    private final String rawPayload;
+    private final Sensor sensor;
 
     public TelemetryData(BigDecimal value, String rawPayload, Sensor sensor) {
-        this.telemetryId = UUID.randomUUID();
-        this.timestamp = LocalDateTime.now();
-        this.value = value;
-        this.rawPayload = rawPayload;
-        this.sensor = sensor;
+        this(UUID.randomUUID(), LocalDateTime.now(), value, rawPayload, sensor);
     }
 
     public TelemetryData(UUID telemetryId, LocalDateTime timestamp, BigDecimal value, String rawPayload, Sensor sensor) {

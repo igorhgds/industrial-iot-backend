@@ -9,28 +9,19 @@ import java.util.UUID;
 
 public class Sensor {
 
-    private UUID sensorId;
-    private String code;
-    private SensorType type;
+    private final UUID sensorId;
+    private final String code;
+    private final SensorType type;
     private SensorStatus status;
-    private String unitOfMeasure;
+    private final String unitOfMeasure;
     private BigDecimal minThreshold;
     private BigDecimal maxThreshold;
     private String mqttTopic;
     private Equipment equipment;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public Sensor(String code, SensorType type, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, Equipment equipment) {
-        this.sensorId = UUID.randomUUID();
-        this.code = code;
-        this.type = type;
-        this.status = status;
-        this.unitOfMeasure = unitOfMeasure;
-        this.minThreshold = minThreshold;
-        this.maxThreshold = maxThreshold;
-        this.mqttTopic = mqttTopic;
-        this.equipment = equipment;
-        this.createdAt = LocalDateTime.now();
+        this(UUID.randomUUID(), code , type, status, unitOfMeasure, minThreshold, maxThreshold, mqttTopic, equipment, LocalDateTime.now());
     }
 
     public Sensor(UUID sensorId, String code, SensorType type, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, Equipment equipment, LocalDateTime createdAt) {
