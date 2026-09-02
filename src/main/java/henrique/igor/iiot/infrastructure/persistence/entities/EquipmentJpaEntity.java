@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -18,7 +19,8 @@ public class EquipmentJpaEntity {
     @Id
     private UUID equipmentId;
 
-    @Column(nullable = false, unique = true) //TODO must a code with type + anything
+    //TODO must a code with type + anything
+    @Column(nullable = false, unique = true)
     private String equipCode;
 
     @Column(nullable = false)
@@ -35,6 +37,9 @@ public class EquipmentJpaEntity {
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "equipment")
+    private List<SensorJpaEntity> sensors;
 
     public EquipmentJpaEntity(){}
 
