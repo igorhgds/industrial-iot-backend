@@ -67,6 +67,54 @@ Repository: igorhgds/industrial-iot-backend
   - [ ] Flyway runs automatically on Spring Boot application startup without errors.
 - **Definition of Done (DoD):** Tables created in PostgreSQL database `industrial_iiot_db`.
 
+### Issue #25: [M2-RE01] TimescaleDB Infrastructure & Docker Migration
+- **Type:** Feature / Infra
+- **Labels:** `infrastructure`, `database`
+- **Description:**
+  Update local Docker Compose configuration to replace standard PostgreSQL with TimescaleDB (`timescale/timescaledb:latest-pg16`) to support high-throughput time-series telemetry data.
+- **Acceptance Criteria:**
+  - [ ] Update `docker-compose.yml` image to `timescale/timescaledb:latest-pg16`.
+  - [ ] Verify container starts successfully and `timescaledb` extension is available.
+- **Definition of Done (DoD):** Docker container running TimescaleDB on PostgreSQL 16.
+
+### Issue #26: [M2-RE02] Flyway Migrations for Equipment State, Gateways & TimescaleDB Hypertables
+- **Type:** Feature / Database
+- **Labels:** `database`
+- **Description:**
+  Create Flyway migration scripts to enable TimescaleDB extension, introduce `equipment_state` table, create `gateways` table, and convert `telemetry_data` into a Hypertable.
+- **Acceptance Criteria:**
+  - [ ] `V09__enable_timescaledb.sql`, `V10__create_equipment_state_table.sql`, `V11__convert_telemetry_to_hypertable.sql`, `V12__create_gateways_table.sql` created.
+- **Definition of Done (DoD):** Flyway migrations execute cleanly on application startup.
+
+### Issue #27: [M2-RE03] Dynamic Rules Engine Schema Migration
+- **Type:** Feature / Database
+- **Labels:** `database`
+- **Description:**
+  Migrate database schema from static thresholds to a dynamic rule engine (`rule_groups` and `rule_conditions`).
+- **Acceptance Criteria:**
+  - [ ] `V13__create_rule_groups_table.sql`, `V14__create_rule_conditions_table.sql`, `V15__migrate_thresholds_to_rules.sql`, `V16__remove_thresholds_from_sensors.sql` created.
+- **Definition of Done (DoD):** Schema updated and legacy threshold data migrated to rule groups.
+
+### Issue #28: [M3-RE01] Redesign Domain Entities & JPA Mapping for Gateways, Rules & State
+- **Type:** Feature / Domain
+- **Labels:** `domain`
+- **Description:**
+  Create pure Java domain models and JPA entities/mappers for `EquipmentState`, `Gateway`, `RuleGroup`, `RuleCondition`, and `HealthStatus`.
+- **Acceptance Criteria:**
+  - [ ] Pure Java domain entities and JPA mappers created.
+  - [ ] `Sensor` and `TelemetryData` domain & JPA models updated.
+- **Definition of Done (DoD):** Domain models compiled with 100% pure Java separation.
+
+### Issue #29: [M1-RE01] Python Simulator Update for Gateway & Telemetry Payload
+- **Type:** Feature / Simulator
+- **Labels:** `simulator`
+- **Description:**
+  Update Python motor simulator (`simulators/motor_simulator.py`) to include `gatewayCode` in the telemetry payload.
+- **Acceptance Criteria:**
+  - [ ] `motor_simulator.py` updated with `gatewayCode`.
+- **Definition of Done (DoD):** Simulator publishes valid gateway telemetry payloads.
+
+
 ---
 
 ## ⚙️ Milestone 3: Core Domain & Clean Architecture
