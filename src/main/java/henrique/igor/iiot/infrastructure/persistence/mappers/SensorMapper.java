@@ -10,7 +10,7 @@ public class SensorMapper {
         return new SensorJpaEntity(
                 domain.getSensorId(),
                 domain.getCode(),
-                domain.getType(),
+                domain.getSensorType(),
                 domain.getStatus(),
                 domain.getUnitOfMeasure(),
                 domain.getMinThreshold(),
@@ -26,7 +26,7 @@ public class SensorMapper {
         return new Sensor(
                 jpaEntity.getSensorId(),
                 jpaEntity.getCode(),
-                jpaEntity.getType(),
+                jpaEntity.getSensorType(),
                 jpaEntity.getStatus(),
                 jpaEntity.getUnitOfMeasure(),
                 jpaEntity.getMinThreshold(),

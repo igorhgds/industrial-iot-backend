@@ -11,7 +11,7 @@ public class Sensor {
 
     private final UUID sensorId;
     private final String code;
-    private final SensorType type;
+    private final SensorType sensorType;
     private SensorStatus status;
     private final String unitOfMeasure;
     private BigDecimal minThreshold;
@@ -20,14 +20,14 @@ public class Sensor {
     private Equipment equipment;
     private final LocalDateTime createdAt;
 
-    public Sensor(String code, SensorType type, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, Equipment equipment) {
-        this(UUID.randomUUID(), code , type, status, unitOfMeasure, minThreshold, maxThreshold, mqttTopic, equipment, LocalDateTime.now());
+    public Sensor(String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, Equipment equipment) {
+        this(UUID.randomUUID(), code , sensorType, status, unitOfMeasure, minThreshold, maxThreshold, mqttTopic, equipment, LocalDateTime.now());
     }
 
-    public Sensor(UUID sensorId, String code, SensorType type, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, Equipment equipment, LocalDateTime createdAt) {
+    public Sensor(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, Equipment equipment, LocalDateTime createdAt) {
         this.sensorId = sensorId;
         this.code = code;
-        this.type = type;
+        this.sensorType = sensorType;
         this.status = status;
         this.unitOfMeasure = unitOfMeasure;
         this.minThreshold = minThreshold;
@@ -39,7 +39,7 @@ public class Sensor {
 
     public UUID getSensorId() {return sensorId;}
     public String getCode() {return code;}
-    public SensorType getType() {return type;}
+    public SensorType getSensorType() {return sensorType;}
     public SensorStatus getStatus() {return status;}
     public String getUnitOfMeasure() {return unitOfMeasure;}
     public BigDecimal getMinThreshold() {return minThreshold;}

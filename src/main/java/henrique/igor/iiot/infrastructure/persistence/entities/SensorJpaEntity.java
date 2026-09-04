@@ -24,7 +24,7 @@ public class SensorJpaEntity {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private SensorType type;
+    private SensorType sensorType;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
@@ -48,10 +48,10 @@ public class SensorJpaEntity {
 
     public SensorJpaEntity(){}
 
-    public SensorJpaEntity(UUID sensorId, String code, SensorType type, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, EquipmentJpaEntity equipment, LocalDateTime createdAt) {
+    public SensorJpaEntity(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, EquipmentJpaEntity equipment, LocalDateTime createdAt) {
         this.sensorId = sensorId;
         this.code = code;
-        this.type = type;
+        this.sensorType = sensorType;
         this.status = status;
         this.unitOfMeasure = unitOfMeasure;
         this.minThreshold = minThreshold;
