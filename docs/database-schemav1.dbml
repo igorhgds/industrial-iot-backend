@@ -1,5 +1,5 @@
 // ==========================================
-// ESTRUTURA DE BANCO DE DADOS IIOT / INDUSTRIA 4.0
+// ESTRUTURA DE BANCO DE DADOS IIOT / INDUSTRIA 4.0 (TimescaleDB Hypertables)
 // ==========================================
 
 // Enums definition
@@ -22,6 +22,12 @@ Enum equipment_status {
   ACTIVE
   MAINTENANCE
   INACTIVE
+}
+
+Enum gateway_status {
+  ONLINE
+  OFFLINE
+  MAINTENANCE
 }
 
 Enum sensor_type {
@@ -81,7 +87,19 @@ Table sectors {
   id uuid [pk, default: `gen_random_uuid()`]
   name varchar [not null, note: 'Ex: Pátio Fabril, Linha A, HVAC']
   description text
-  created_at timestamp [default: `now()`]
+  created_at timestamptz [default: `now()`]
+}
+
+Table gateways {
+  id uuid [pk, default: `gen_random_uuid()`]
+  code varchar(50) [unique, not null, note: 'Ex: GW-SECTOR-A-01']
+  mac_address varchar(17) [unique]
+  ip_address varchar(45)
+  firmware_version varchar(20)
+  status gateway_status [not null, default: 'ONLINE']
+  sector_id uuid [ref: > sectors.id]
+  last_ping timestamptz
+  created_at timestamptz [default: `now()`]
 }
 
 Table users {
@@ -91,7 +109,7 @@ Table users {
   password_hash varchar [not null]
   role user_role [not null, default: 'OPERATOR']
   sector_id uuid [ref: > sectors.id]
-  created_at timestamp [default: `now()`]
+  created_at timestamptz [default: `now()`]
 }
 
 Table equipments {
@@ -100,7 +118,15 @@ Table equipments {
   type equipment_type [not null]
   status equipment_status [default: 'ACTIVE']
   sector_id uuid [ref: > sectors.id]
-  created_at timestamp [default: `now()`]
+  gateway_id uuid [ref: > gateways.id]
+  created_at timestamptz [default: `now()`]
+}
+
+Table equipment_state {
+  equipment_id uuid [pk, ref: - equipments.id, note: 'Device Shadow (Tier 2 Real-Time State)']
+  status varchar(50) [not null, default: 'UNKNOWN']
+  last_payload jsonb [not null, default: '{}']
+  updated_at timestamptz [not null, default: `now()`]
 }
 
 Table sensors {
@@ -113,15 +139,19 @@ Table sensors {
   max_threshold float [note: 'Limite máximo para alerta']
   status sensor_status [default: 'ONLINE']
   mqtt_topic varchar [note: 'Tópico do broker MQTT para escuta do sensor']
-  created_at timestamp [default: `now()`]
+  created_at timestamptz [default: `now()`]
 }
 
 Table telemetry_data {
-  id uuid [pk, default: `gen_random_uuid()`]
-  sensor_id uuid [ref: > sensors.id]
-  timestamp timestamp [not null, default: `now()`]
-  value float [not null]
-  raw_payload text [note: 'Payload JSON original enviado pelo gateway/ESP32']
+  sensor_id uuid [not null, ref: > sensors.id]
+  timestamp timestamptz [not null, default: `now()`, note: 'Partition Key (TimescaleDB Hypertable)']
+  value decimal [not null]
+  raw_payload jsonb [note: 'Payload JSON original enviado pelo gateway/ESP32']
+
+  indexes {
+    (sensor_id, timestamp) [pk]
+    (sensor_id, timestamp) [name: 'idx_telemetry_sensor_timestamp']
+  }
 }
 
 Table alerts {
@@ -133,8 +163,8 @@ Table alerts {
   value_at_trigger float [not null]
   status alert_status [default: 'PENDING']
   acknowledged_by uuid [ref: > users.id]
-  triggered_at timestamp [default: `now()`]
-  resolved_at timestamp
+  triggered_at timestamptz [default: `now()`]
+  resolved_at timestamptz
 }
 
 Table work_orders {
@@ -146,8 +176,8 @@ Table work_orders {
   description text
   priority work_order_priority [default: 'MEDIUM']
   status work_order_status [default: 'OPEN']
-  created_at timestamp [default: `now()`]
-  closed_at timestamp
+  created_at timestamptz [default: `now()`]
+  closed_at timestamptz
 }
 
 Table automation_rules {

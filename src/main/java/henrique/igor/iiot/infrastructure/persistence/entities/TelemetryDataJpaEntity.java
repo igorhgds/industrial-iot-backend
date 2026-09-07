@@ -3,10 +3,10 @@ package henrique.igor.iiot.infrastructure.persistence.entities;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "telemetry_data")
@@ -14,28 +14,27 @@ import java.util.UUID;
 @Setter
 public class TelemetryDataJpaEntity {
 
-    @Id
-    private UUID telemetryId;
+    @EmbeddedId
+    private TelemetryDataId id;
 
-    @Column(nullable = false)
-    private LocalDateTime timestamp;
-
-    @Column(nullable = false)
-    private BigDecimal value;
-
-    private String rawPayload;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "sensor_id")
+    @MapsId("sensorId")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "sensor_id", nullable = false)
     private SensorJpaEntity sensor;
 
-    public TelemetryDataJpaEntity(){}
+    @Column(name = "value")
+    private BigDecimal value;
 
-    public TelemetryDataJpaEntity(UUID telemetryId, LocalDateTime timestamp, BigDecimal value, String rawPayload, SensorJpaEntity sensor) {
-        this.telemetryId = telemetryId;
-        this.timestamp = timestamp;
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "raw_payload", columnDefinition = "jsonb")
+    private String rawPayload;
+
+    public TelemetryDataJpaEntity() {}
+
+    public TelemetryDataJpaEntity(TelemetryDataId id, SensorJpaEntity sensor, BigDecimal value, String rawPayload) {
+        this.id = id;
+        this.sensor = sensor;
         this.value = value;
         this.rawPayload = rawPayload;
-        this.sensor = sensor;
     }
 }
