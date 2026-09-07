@@ -1,6 +1,5 @@
 package henrique.igor.iiot.infrastructure.persistence.entities;
 
-import henrique.igor.iiot.domain.entities.TelemetryDataId;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
