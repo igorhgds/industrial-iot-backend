@@ -17,9 +17,9 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
 
 - **Event-Driven Architecture (EDA):** Dual-broker strategy utilizing **Mosquitto (MQTT)** for lightweight real-time telemetry ingestion and actuation, and **RabbitMQ (AMQP)** for transactional, guaranteed delivery of critical anomaly alerts and maintenance work orders (Ordens de Serviço).
 - **Three-Tier Data Architecture Separation:** 
-  1. *Configuration:* PostgreSQL relational tables (`equipments`, `sensors`, `gateways`, `rules`).
+  1. *Configuration:* Relational tables (`equipments`, `sensors`, `gateways`, `rules`).
   2. *Current State:* Fast $O(1)$ equipment status lookup (`equipment_state`).
-  3. *Historical Stream:* TimescaleDB Hypertable (`telemetry_data`) for append-only time-series scale. See [TimescaleDB Architecture Docs](file:///media/igor/Projetos/00%20-%20Web%20Developer/01%20-%20Projetos/Industrial_IoT/industrial-iot-backend/docs/timescaledb-architecture.md).
+  3. *Historical Stream:* TimescaleDB Hypertable (`telemetry_data`) for high-throughput time-series telemetry scale.
 - **Clean & Hexagonal Architecture:** Strict Separation of Concerns. Core domain business logic is decoupled from frameworks, ensuring testability and longevity.
 - **Quality Assurance & Verification:** Comprehensive unit and integration test coverage using JUnit 5, Mockito, and Testcontainers.
 - **Container-First Environment:** 100% conteinerized local environment managed via Docker Compose.
