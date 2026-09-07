@@ -4,6 +4,7 @@
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1.x-brightgreen?style=for-the-badge&logo=springboot)
 ![Docker](https://img.shields.io/badge/Docker-24.0+-blue?style=for-the-badge&logo=docker)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16-blue?style=for-the-badge&logo=postgresql)
+![TimescaleDB](https://img.shields.io/badge/TimescaleDB-Hypertable-yellow?style=for-the-badge&logo=timescale)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.13-orange?style=for-the-badge&logo=rabbitmq)
 ![MQTT](https://img.shields.io/badge/Eclipse_Mosquitto-2.0-purple?style=for-the-badge&logo=eclipse-ide)
 ![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
@@ -15,6 +16,10 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
 ## 📌 Architectural Principles
 
 - **Event-Driven Architecture (EDA):** Dual-broker strategy utilizing **Mosquitto (MQTT)** for lightweight real-time telemetry ingestion and actuation, and **RabbitMQ (AMQP)** for transactional, guaranteed delivery of critical anomaly alerts and maintenance work orders (Ordens de Serviço).
+- **Three-Tier Data Architecture Separation:** 
+  1. *Configuration:* PostgreSQL relational tables (`equipments`, `sensors`, `gateways`, `rules`).
+  2. *Current State:* Fast $O(1)$ equipment status lookup (`equipment_state`).
+  3. *Historical Stream:* TimescaleDB Hypertable (`telemetry_data`) for append-only time-series scale. See [TimescaleDB Architecture Docs](file:///media/igor/Projetos/00%20-%20Web%20Developer/01%20-%20Projetos/Industrial_IoT/industrial-iot-backend/docs/timescaledb-architecture.md).
 - **Clean & Hexagonal Architecture:** Strict Separation of Concerns. Core domain business logic is decoupled from frameworks, ensuring testability and longevity.
 - **Quality Assurance & Verification:** Comprehensive unit and integration test coverage using JUnit 5, Mockito, and Testcontainers.
 - **Container-First Environment:** 100% conteinerized local environment managed via Docker Compose.
@@ -26,7 +31,7 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
 ```mermaid
 graph TD
     subgraph edge_sim ["Edge & Simulators"]
-        MS["Python Motor Simulator (MTR-5CV-01)"]
+        MS["Python Motor Simulator (Gateway Payload)"]
     end
 
     subgraph msg_broker ["Messaging Broker Layer"]
@@ -34,15 +39,17 @@ graph TD
         RMQ["🐇 RabbitMQ AMQP Broker (AMQP :5672 / Mgmt :15672)<br/>[Critical Alerts & Work Orders]"]
     end
 
-    subgraph backend_core ["Backend Core (Spring Boot 3.4 / Java 21)"]
+    subgraph backend_core ["Backend Core (Spring Boot 4.1 / Java 21)"]
         ING["📥 Telemetry Ingestion Consumer"]
         UC["⚙️ Clean Architecture Use Cases (ProcessTelemetryUseCase)"]
+        RULES["⚡ Dynamic Rules Engine (in Java Domain)"]
         HVAC["🌡️ HVAC Thermal Controller Module"]
         ALERT["🚨 Alert & Work Order Dispatcher"]
     end
 
-    subgraph persistence ["Persistence & Storage"]
-        PG[("🐘 PostgreSQL 16 DB (industrial_iiot_db)")]
+    subgraph persistence ["Persistence & Storage Layer"]
+        PG[("🐘 PostgreSQL 16 (Config, State, Rules)")]
+        TS[("⏱️ TimescaleDB Hypertable (telemetry_data)")]
         FLY["✈️ Flyway Migrations"]
     end
 
@@ -50,16 +57,18 @@ graph TD
         ANG["🅰️ Angular Real-Time Dashboard (WebSockets / SSE)"]
     end
 
-    MS -->|1. Publish MQTT Telemetry| MQTT
+    MS -->|1. Publish Gateway Payload| MQTT
     MQTT -->|2. Consume Sensor Stream| ING
     ING --> UC
-    UC -->|3. Save Telemetry Readings| PG
+    UC -->|3. Save Time-Series Readings| TS
+    UC --> RULES
+    RULES -->|4. Update Current Health Status| PG
     FLY -.->|Schema Versioning| PG
-    UC -->|4. Detect Anomaly & Trigger Alert| ALERT
-    ALERT -->|5. Publish Guaranteed Event| RMQ
-    UC -->|6. Thermal Management Rule| HVAC
-    HVAC -->|7. Actuation Command| MQTT
-    UC -->|8. Real-Time Stream| ANG
+    RULES -->|5. Detect Anomaly & Trigger Alert| ALERT
+    ALERT -->|6. Publish Guaranteed Event| RMQ
+    RULES -->|7. Thermal Management Rule| HVAC
+    HVAC -->|8. Actuation Command| MQTT
+    UC -->|9. Real-Time Stream| ANG
 ```
 
 ---
@@ -70,9 +79,9 @@ We follow an iterative milestone roadmap. Documented below is our current develo
 
 | Milestone | Scope & Objectives | Status |
 | :--- | :--- | :---: |
-| **Milestone 1** | **Infra & Ingestion Pipeline:** Docker Compose setup (PostgreSQL, Mosquitto, RabbitMQ) + Python Motor Simulator | COMPLETED ✅ |
-| **Milestone 2** | **Database & Data Modeling:** Relational Schema (ERD), Time-Series indexing, Flyway DB Migrations | IN PROGRESS ⏳ |
-| **Milestone 3** | **Core Domain & Clean Architecture:** Pure Java Domain Model, Use Cases, Async Ingestion Consumers | PLANNED 📋 |
+| **Milestone 1** | **Infra & Ingestion Pipeline:** Docker Compose setup (TimescaleDB, Mosquitto, RabbitMQ) + Python Motor Simulator | COMPLETED ✅ |
+| **Milestone 2** | **Database & Data Modeling:** TimescaleDB Hypertables, 3-Tier Schema (Config/State/History), Flyway Migrations | IN PROGRESS ⏳ |
+| **Milestone 3** | **Core Domain & Clean Architecture:** Pure Java Domain Model, Gateway & Rules Engine, Async Consumers | IN PROGRESS ⏳ |
 | **Milestone 4** | **Frontend Integration & Real-Time:** Angular Dashboard, RxJS State, WebSockets / SSE streaming | PLANNED 📋 |
 | **Milestone 5** | **Actuation & Feedback Loop:** Bi-directional MQTT commands (Emergency stop, speed throttling) | PLANNED 📋 |
 | **Milestone 6** | **HVAC Control & Thermal Module:** Native internal HVAC thermal management engine | PLANNED 📋 |
@@ -84,10 +93,11 @@ We follow an iterative milestone roadmap. Documented below is our current develo
 
 - **Core Backend:** Java 21 LTS, Spring Boot 4.1.x, Spring Data JPA, Flyway DB
 - **Messaging Brokers:** Eclipse Mosquitto v2 (MQTT / WebSockets), RabbitMQ 3.13 (AMQP)
-- **Database:** PostgreSQL 16 (Time-series indexed)
+- **Database:** PostgreSQL 16 + **TimescaleDB** (Timescale Hypertable time-series storage)
 - **IoT Simulators:** Python 3.10+, Paho-MQTT 2.x
 - **Frontend (Upcoming):** Angular, RxJS, Chart.js / ngx-charts
 - **DevOps & Tools:** Docker, Docker Compose, Git, Linux Mint
+
 
 ---
 
