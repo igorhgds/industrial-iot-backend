@@ -80,20 +80,22 @@ Repository: igorhgds/industrial-iot-backend
 ### Issue #26: [M2-RE02] Flyway Migrations for Equipment State, Gateways & TimescaleDB Hypertables
 - **Type:** Feature / Database
 - **Labels:** `database`
+- **Status:** Done ✅
 - **Description:**
   Create Flyway migration scripts to enable TimescaleDB extension, introduce `equipment_state` table, create `gateways` table, and convert `telemetry_data` into a Hypertable.
 - **Acceptance Criteria:**
-  - [ ] `V09__enable_timescaledb.sql`, `V10__create_equipment_state_table.sql`, `V11__convert_telemetry_to_hypertable.sql`, `V12__create_gateways_table.sql` created.
+  - [x] `V09__enable_timescaledb.sql`, `V10__create_equipment_state.sql`, `V11__create_gateways_table.sql` created.
 - **Definition of Done (DoD):** Flyway migrations execute cleanly on application startup.
 
 ### Issue #27: [M2-RE03] Dynamic Rules Engine Schema Migration
 - **Type:** Feature / Database
 - **Labels:** `database`
+- **Status:** Done ✅
 - **Description:**
   Migrate database schema from static thresholds to a dynamic rule engine (`rule_groups` and `rule_conditions`).
 - **Acceptance Criteria:**
-  - [ ] `V13__create_rule_groups_table.sql`, `V14__create_rule_conditions_table.sql`, `V15__migrate_thresholds_to_rules.sql`, `V16__remove_thresholds_from_sensors.sql` created.
-- **Definition of Done (DoD):** Schema updated and legacy threshold data migrated to rule groups.
+  - [x] `V12__create_rule_groups_table.sql`, `V13__create_rule_conditions_table.sql`, `V14__remove_thresholds_from_sensors.sql` created.
+- **Definition of Done (DoD):** Schema updated to dynamic rule groups and conditions.
 
 ### Issue #28: [M3-RE01] Redesign Domain Entities & JPA Mapping for Gateways, Rules & State
 - **Type:** Feature / Domain

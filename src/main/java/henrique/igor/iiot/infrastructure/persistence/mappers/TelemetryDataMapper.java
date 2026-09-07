@@ -1,8 +1,7 @@
 package henrique.igor.iiot.infrastructure.persistence.mappers;
 
 import henrique.igor.iiot.domain.entities.*;
-import henrique.igor.iiot.infrastructure.persistence.entities.SensorJpaEntity;
-import henrique.igor.iiot.infrastructure.persistence.entities.TelemetryDataJpaEntity;
+import henrique.igor.iiot.infrastructure.persistence.entities.*;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

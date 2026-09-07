@@ -1,4 +1,4 @@
-package henrique.igor.iiot.domain.entities;
+package henrique.igor.iiot.infrastructure.persistence.entities;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
