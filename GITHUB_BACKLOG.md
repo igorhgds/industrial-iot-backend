@@ -103,8 +103,8 @@ Repository: igorhgds/industrial-iot-backend
 - **Description:**
   Create pure Java domain models and JPA entities/mappers for `EquipmentState`, `Gateway`, `RuleGroup`, `RuleCondition`, and `HealthStatus`.
 - **Acceptance Criteria:**
-  - [ ] Pure Java domain entities and JPA mappers created.
-  - [ ] `Sensor` and `TelemetryData` domain & JPA models updated.
+  - [x] Pure Java domain entities and JPA mappers created.
+  - [x] `Sensor` and `TelemetryData` domain & JPA models updated.
 - **Definition of Done (DoD):** Domain models compiled with 100% pure Java separation.
 
 ### Issue #29: [M1-RE01] Python Simulator Update for Gateway & Telemetry Payload
