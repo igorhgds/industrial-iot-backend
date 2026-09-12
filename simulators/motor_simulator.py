@@ -5,8 +5,9 @@ import random
 import paho.mqtt.client as mqtt
 
 class MotorSimulator:
-   def __init__(self, equipment_code, mqtt_broker="localhost", mqtt_port=1883):
+   def __init__(self, equipment_code, gateway_code="GW-01", mqtt_broker="localhost", mqtt_port=1883):
         self.equipment_code = equipment_code
+        self.gateway_code = gateway_code
         self.mqtt_broker = mqtt_broker
         self.mqtt_port = mqtt_port
 
@@ -33,6 +34,7 @@ class MotorSimulator:
    def generate_telemetry(self):
       return {
             "equipmentCode": self.equipment_code,  # camelCase para bater com o Java DTO
+            "gatewayCode": self.gateway_code,      # camelCase para bater com o Java DTO / Gateway
             "timestamp": datetime.now().isoformat(),  # Formato ISO-8601 (ex: "2026-08-17T14:30:00.123456")
             "readings": [
                 {
