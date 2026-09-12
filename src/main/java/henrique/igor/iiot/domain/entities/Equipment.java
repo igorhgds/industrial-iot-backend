@@ -13,18 +13,20 @@ public class Equipment {
     private EquipType type;
     private EquipStatus status;
     private Sector sector;
+    private Gateway gateway;
     private final LocalDateTime createdAt;
 
-    public Equipment(String equipCode, EquipType type, EquipStatus status, Sector sector) {
-        this(UUID.randomUUID(), equipCode, type, status, sector, LocalDateTime.now());
+    public Equipment(String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway) {
+        this(UUID.randomUUID(), equipCode, type, status, sector, gateway ,LocalDateTime.now());
     }
 
-    public Equipment(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, Sector sector, LocalDateTime createdAt) {
+    public Equipment(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway ,LocalDateTime createdAt) {
         this.equipmentId = equipmentId;
         this.equipCode = equipCode;
         this.type = type;
         this.status = status;
         this.sector = sector;
+        this.gateway = gateway;
         this.createdAt = createdAt;
     }
 
@@ -33,5 +35,6 @@ public class Equipment {
     public EquipType getType() {return type;}
     public EquipStatus getStatus() {return status;}
     public Sector getSector() {return sector;}
+    public Gateway getGateway() {return gateway;}
     public LocalDateTime getCreatedAt() {return createdAt;}
 }

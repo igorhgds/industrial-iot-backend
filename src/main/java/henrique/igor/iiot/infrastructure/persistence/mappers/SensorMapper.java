@@ -13,8 +13,6 @@ public class SensorMapper {
                 domain.getSensorType(),
                 domain.getStatus(),
                 domain.getUnitOfMeasure(),
-                domain.getMinThreshold(),
-                domain.getMaxThreshold(),
                 domain.getMqttTopic(),
                 domain.getEquipment() != null ? EquipmentMapper.toJpaEntity(domain.getEquipment()): null,
                 domain.getCreatedAt()
@@ -29,8 +27,6 @@ public class SensorMapper {
                 jpaEntity.getSensorType(),
                 jpaEntity.getStatus(),
                 jpaEntity.getUnitOfMeasure(),
-                jpaEntity.getMinThreshold(),
-                jpaEntity.getMaxThreshold(),
                 jpaEntity.getMqttTopic(),
                 jpaEntity.getEquipment() != null ? EquipmentMapper.toDomain(jpaEntity.getEquipment()) : null,
                 jpaEntity.getCreatedAt()
