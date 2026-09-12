@@ -45,36 +45,39 @@ Repository: igorhgds/industrial-iot-backend
 
 ---
 
-## 🗄️ Milestone 2: Database & Data Modeling [STATUS: IN PROGRESS ⏳]
+## 🗄️ Milestone 2: Database & Data Modeling [STATUS: CLOSED / COMPLETED ✅]
 
 ### Issue #3: [M2-US01] PostgreSQL Schema & Entity Relationship Diagram (ERD)
 - **Type:** Feature / Database
 - **Labels:** `database`, `m2-db`
+- **Status:** Done ✅
 - **Description:**
   Design relational database schema for motors, sensors, telemetry readings, and anomaly alerts. Draw ERD diagram.
 - **Acceptance Criteria:**
-  - [ ] ERD diagram created (Mermaid or DB Diagram format) documenting tables: `motors`, `telemetry_readings`, `anomalies`.
-  - [ ] Foreign keys, indexes on timestamp and motor_id for fast time-series queries.
+  - [x] ERD diagram created (Mermaid or DB Diagram format) documenting tables: `motors`, `telemetry_readings`, `anomalies`.
+  - [x] Foreign keys, indexes on timestamp and motor_id for fast time-series queries.
 - **Definition of Done (DoD):** ERD documented in `/docs/erd.md` or README.
 
 ### Issue #4: [M2-US02] Flyway Database Migration Setup
 - **Type:** Feature / Database
 - **Labels:** `database`, `m2-db`
+- **Status:** Done ✅
 - **Description:**
   Create Flyway migration scripts (`V1__init_schema.sql`) inside Spring Boot project (`src/main/resources/db/migration`).
 - **Acceptance Criteria:**
-  - [ ] `V1__create_tables.sql` creates `motors` and `telemetry_readings` tables.
-  - [ ] Flyway runs automatically on Spring Boot application startup without errors.
+  - [x] `V1__create_tables.sql` creates `motors` and `telemetry_readings` tables.
+  - [x] Flyway runs automatically on Spring Boot application startup without errors.
 - **Definition of Done (DoD):** Tables created in PostgreSQL database `industrial_iiot_db`.
 
 ### Issue #25: [M2-RE01] TimescaleDB Infrastructure & Docker Migration
 - **Type:** Feature / Infra
 - **Labels:** `infrastructure`, `database`
+- **Status:** Done ✅
 - **Description:**
   Update local Docker Compose configuration to replace standard PostgreSQL with TimescaleDB (`timescale/timescaledb:latest-pg16`) to support high-throughput time-series telemetry data.
 - **Acceptance Criteria:**
-  - [ ] Update `docker-compose.yml` image to `timescale/timescaledb:latest-pg16`.
-  - [ ] Verify container starts successfully and `timescaledb` extension is available.
+  - [x] Update `docker-compose.yml` image to `timescale/timescaledb:latest-pg16`.
+  - [x] Verify container starts successfully and `timescaledb` extension is available.
 - **Definition of Done (DoD):** Docker container running TimescaleDB on PostgreSQL 16.
 
 ### Issue #26: [M2-RE02] Flyway Migrations for Equipment State, Gateways & TimescaleDB Hypertables
@@ -100,6 +103,7 @@ Repository: igorhgds/industrial-iot-backend
 ### Issue #28: [M3-RE01] Redesign Domain Entities & JPA Mapping for Gateways, Rules & State
 - **Type:** Feature / Domain
 - **Labels:** `domain`
+- **Status:** Done ✅
 - **Description:**
   Create pure Java domain models and JPA entities/mappers for `EquipmentState`, `Gateway`, `RuleGroup`, `RuleCondition`, and `HealthStatus`.
 - **Acceptance Criteria:**
@@ -110,10 +114,11 @@ Repository: igorhgds/industrial-iot-backend
 ### Issue #29: [M1-RE01] Python Simulator Update for Gateway & Telemetry Payload
 - **Type:** Feature / Simulator
 - **Labels:** `simulator`
+- **Status:** Done ✅
 - **Description:**
   Update Python motor simulator (`simulators/motor_simulator.py`) to include `gatewayCode` in the telemetry payload.
 - **Acceptance Criteria:**
-  - [ ] `motor_simulator.py` updated with `gatewayCode`.
+  - [x] `motor_simulator.py` updated with `gatewayCode`.
 - **Definition of Done (DoD):** Simulator publishes valid gateway telemetry payloads.
 
 

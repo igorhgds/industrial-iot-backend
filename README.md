@@ -80,7 +80,7 @@ We follow an iterative milestone roadmap. Documented below is our current develo
 | Milestone | Scope & Objectives | Status |
 | :--- | :--- | :---: |
 | **Milestone 1** | **Infra & Ingestion Pipeline:** Docker Compose setup (TimescaleDB, Mosquitto, RabbitMQ) + Python Motor Simulator | COMPLETED ✅ |
-| **Milestone 2** | **Database & Data Modeling:** TimescaleDB Hypertables, 3-Tier Schema (Config/State/History), Flyway Migrations | IN PROGRESS ⏳ |
+| **Milestone 2** | **Database & Data Modeling:** TimescaleDB Hypertables, 3-Tier Schema (Config/State/History), Flyway Migrations | COMPLETED ✅ |
 | **Milestone 3** | **Core Domain & Clean Architecture:** Pure Java Domain Model, Gateway & Rules Engine, Async Consumers | IN PROGRESS ⏳ |
 | **Milestone 4** | **Frontend Integration & Real-Time:** Angular Dashboard, RxJS State, WebSockets / SSE streaming | PLANNED 📋 |
 | **Milestone 5** | **Actuation & Feedback Loop:** Bi-directional MQTT commands (Emergency stop, speed throttling) | PLANNED 📋 |
