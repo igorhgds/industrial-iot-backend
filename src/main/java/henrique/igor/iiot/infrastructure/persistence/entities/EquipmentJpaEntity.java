@@ -1,5 +1,6 @@
 package henrique.igor.iiot.infrastructure.persistence.entities;
 
+import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import jakarta.persistence.*;
@@ -41,14 +42,19 @@ public class EquipmentJpaEntity {
     @OneToMany(mappedBy = "equipment")
     private List<SensorJpaEntity> sensors;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "gateway_id")
+    private GatewayJpaEntity gateway;
+
     public EquipmentJpaEntity(){}
 
-    public EquipmentJpaEntity(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, SectorJpaEntity sector, LocalDateTime createdAt) {
+    public EquipmentJpaEntity(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, SectorJpaEntity sector, GatewayJpaEntity gateway, LocalDateTime createdAt) {
         this.equipmentId = equipmentId;
         this.equipCode = equipCode;
         this.type = type;
         this.status = status;
         this.sector = sector;
+        this.gateway = gateway;
         this.createdAt = createdAt;
     }
 }

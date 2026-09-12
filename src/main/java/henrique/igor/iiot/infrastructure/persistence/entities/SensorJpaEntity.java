@@ -32,12 +32,7 @@ public class SensorJpaEntity {
 
     private String unitOfMeasure;
 
-    private BigDecimal minThreshold;
-
-    private BigDecimal maxThreshold;
-
     private String mqttTopic;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "equipment_id")
@@ -48,14 +43,12 @@ public class SensorJpaEntity {
 
     public SensorJpaEntity(){}
 
-    public SensorJpaEntity(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, BigDecimal minThreshold, BigDecimal maxThreshold, String mqttTopic, EquipmentJpaEntity equipment, LocalDateTime createdAt) {
+    public SensorJpaEntity(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, EquipmentJpaEntity equipment, LocalDateTime createdAt) {
         this.sensorId = sensorId;
         this.code = code;
         this.sensorType = sensorType;
         this.status = status;
         this.unitOfMeasure = unitOfMeasure;
-        this.minThreshold = minThreshold;
-        this.maxThreshold = maxThreshold;
         this.mqttTopic = mqttTopic;
         this.equipment = equipment;
         this.createdAt = createdAt;

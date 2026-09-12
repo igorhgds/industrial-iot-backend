@@ -13,6 +13,7 @@ public class EquipmentMapper {
                 domain.getType(),
                 domain.getStatus(),
                 domain.getSector() != null ? SectorMapper.toJpaEntity(domain.getSector()) : null,
+                domain.getGateway() != null ? GatewayMapper.toJpaEntity(domain.getGateway()) : null,
                 domain.getCreatedAt()
         );
     }
@@ -25,6 +26,7 @@ public class EquipmentMapper {
                 jpaEntity.getType(),
                 jpaEntity.getStatus(),
                 jpaEntity.getSector() != null ? SectorMapper.toDomain(jpaEntity.getSector()) : null,
+                jpaEntity.getGateway() != null ? GatewayMapper.toDomain(jpaEntity.getGateway()) : null,
                 jpaEntity.getCreatedAt()
         );
     }
