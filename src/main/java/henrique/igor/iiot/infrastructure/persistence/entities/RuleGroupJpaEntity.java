@@ -6,7 +6,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Entity
@@ -33,14 +33,14 @@ public class RuleGroupJpaEntity {
 
     private Boolean isActive;
 
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "ruleGroup", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<RuleConditionJpaEntity> conditions = new ArrayList<>();
 
     public RuleGroupJpaEntity(){}
 
-    public RuleGroupJpaEntity(UUID ruleGroupId, String name, String description, EquipmentJpaEntity equipment, Severity severity, LogicalOperator operatorType, Boolean isActive, LocalDateTime createdAt) {
+    public RuleGroupJpaEntity(UUID ruleGroupId, String name, String description, EquipmentJpaEntity equipment, Severity severity, LogicalOperator operatorType, Boolean isActive, OffsetDateTime createdAt) {
         this.ruleGroupId = ruleGroupId;
         this.name = name;
         this.description = description;

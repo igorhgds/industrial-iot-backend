@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -37,7 +37,7 @@ public class EquipmentJpaEntity {
     private SectorJpaEntity sector;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "equipment")
     private List<SensorJpaEntity> sensors;
@@ -48,7 +48,7 @@ public class EquipmentJpaEntity {
 
     public EquipmentJpaEntity(){}
 
-    public EquipmentJpaEntity(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, SectorJpaEntity sector, GatewayJpaEntity gateway, LocalDateTime createdAt) {
+    public EquipmentJpaEntity(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, SectorJpaEntity sector, GatewayJpaEntity gateway, OffsetDateTime createdAt) {
         this.equipmentId = equipmentId;
         this.equipCode = equipCode;
         this.type = type;

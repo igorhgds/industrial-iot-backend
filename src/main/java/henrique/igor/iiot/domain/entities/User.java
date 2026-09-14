@@ -2,7 +2,7 @@ package henrique.igor.iiot.domain.entities;
 
 import henrique.igor.iiot.domain.entities.enums.UserRole;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class User {
@@ -14,13 +14,13 @@ public class User {
     private String passwordRecovery;
     private UserRole userRole;
     private Sector sector;
-    private final LocalDateTime createdAt;
+    private final OffsetDateTime createdAt;
 
     public User(String name, String email, String password, String passwordRecovery,UserRole userRole, Sector sector){
-        this(UUID.randomUUID(), name, email, password, passwordRecovery ,userRole, sector, LocalDateTime.now());
+        this(UUID.randomUUID(), name, email, password, passwordRecovery ,userRole, sector, OffsetDateTime.now());
     }
 
-    public User(UUID userId, String name, String email, String password, String passwordRecovery, UserRole userRole, Sector sector, LocalDateTime createdAt) {
+    public User(UUID userId, String name, String email, String password, String passwordRecovery, UserRole userRole, Sector sector, OffsetDateTime createdAt) {
         this.userId = userId;
         this.name = name;
         this.email = email;
@@ -38,5 +38,5 @@ public class User {
     public String getPasswordRecovery() {return passwordRecovery;}
     public UserRole getUserRole() {return userRole;}
     public Sector getSector() {return sector;}
-    public LocalDateTime getCreatedAt() {return createdAt;}
+    public OffsetDateTime getCreatedAt() {return createdAt;}
 }

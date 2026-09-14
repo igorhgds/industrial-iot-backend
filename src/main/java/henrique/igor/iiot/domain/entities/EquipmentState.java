@@ -2,16 +2,16 @@ package henrique.igor.iiot.domain.entities;
 
 import henrique.igor.iiot.domain.entities.enums.HealthStatus;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public class EquipmentState {
 
     private Equipment equipmentId;
     private HealthStatus status;
     private String lastPayload;
-    private LocalDateTime updatedAt;
+    private OffsetDateTime updatedAt;
 
-    public EquipmentState(Equipment equipmentId, HealthStatus status, String lastPayload, LocalDateTime updatedAt) {
+    public EquipmentState(Equipment equipmentId, HealthStatus status, String lastPayload, OffsetDateTime updatedAt) {
         this.equipmentId = equipmentId;
         this.status = status;
         this.lastPayload = lastPayload;
@@ -21,5 +21,5 @@ public class EquipmentState {
     public Equipment getEquipmentId() {return equipmentId;}
     public HealthStatus getStatus() {return status;}
     public String getLastPayload() {return lastPayload;}
-    public LocalDateTime getUpdatedAt() {return updatedAt;}
+    public OffsetDateTime getUpdatedAt() {return updatedAt;}
 }

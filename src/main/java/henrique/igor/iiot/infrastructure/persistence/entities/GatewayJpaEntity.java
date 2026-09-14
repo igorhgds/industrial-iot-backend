@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,17 +36,17 @@ public class GatewayJpaEntity {
     @JoinColumn(name = "sector_id")
     private SectorJpaEntity sector;
 
-    private LocalDateTime lastPing;
+    private OffsetDateTime lastPing;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "gateway", fetch = FetchType.LAZY)
     private List<EquipmentJpaEntity> equipment;
 
     public GatewayJpaEntity(){}
 
-    public GatewayJpaEntity(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, SectorJpaEntity sector, LocalDateTime lastPing, LocalDateTime createdAt) {
+    public GatewayJpaEntity(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, SectorJpaEntity sector, OffsetDateTime lastPing, OffsetDateTime createdAt) {
         this.gatewayId = gatewayId;
         this.code = code;
         this.macAddress = macAddress;

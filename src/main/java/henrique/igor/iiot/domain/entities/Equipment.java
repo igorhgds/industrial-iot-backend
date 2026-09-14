@@ -3,7 +3,7 @@ package henrique.igor.iiot.domain.entities;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class Equipment {
@@ -14,13 +14,13 @@ public class Equipment {
     private EquipStatus status;
     private Sector sector;
     private Gateway gateway;
-    private final LocalDateTime createdAt;
+    private final OffsetDateTime createdAt;
 
     public Equipment(String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway) {
-        this(UUID.randomUUID(), equipCode, type, status, sector, gateway ,LocalDateTime.now());
+        this(UUID.randomUUID(), equipCode, type, status, sector, gateway, OffsetDateTime.now());
     }
 
-    public Equipment(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway ,LocalDateTime createdAt) {
+    public Equipment(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway, OffsetDateTime createdAt) {
         this.equipmentId = equipmentId;
         this.equipCode = equipCode;
         this.type = type;
@@ -36,5 +36,5 @@ public class Equipment {
     public EquipStatus getStatus() {return status;}
     public Sector getSector() {return sector;}
     public Gateway getGateway() {return gateway;}
-    public LocalDateTime getCreatedAt() {return createdAt;}
+    public OffsetDateTime getCreatedAt() {return createdAt;}
 }
