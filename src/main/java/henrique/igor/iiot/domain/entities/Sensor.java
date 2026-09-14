@@ -4,7 +4,7 @@ import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorType;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class Sensor {
@@ -16,13 +16,13 @@ public class Sensor {
     private final String unitOfMeasure;
     private String mqttTopic;
     private Equipment equipment;
-    private final LocalDateTime createdAt;
+    private final OffsetDateTime createdAt;
 
-    public Sensor(String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, Equipment equipment) {
-        this(UUID.randomUUID(), code , sensorType, status, unitOfMeasure, mqttTopic, equipment, LocalDateTime.now());
+    public Sensor(String code, SensorType sensorType, String unitOfMeasure, String mqttTopic, Equipment equipment) {
+        this(UUID.randomUUID(), code , sensorType, SensorStatus.ONLINE, unitOfMeasure, mqttTopic, equipment, OffsetDateTime.now());
     }
 
-    public Sensor(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, Equipment equipment, LocalDateTime createdAt) {
+    public Sensor(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, Equipment equipment, OffsetDateTime createdAt) {
         this.sensorId = sensorId;
         this.code = code;
         this.sensorType = sensorType;
@@ -40,5 +40,5 @@ public class Sensor {
     public String getUnitOfMeasure() {return unitOfMeasure;}
     public String getMqttTopic() {return mqttTopic;}
     public Equipment getEquipment() {return equipment;}
-    public LocalDateTime getCreatedAt() {return createdAt;}
+    public OffsetDateTime getCreatedAt() {return createdAt;}
 }

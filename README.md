@@ -17,8 +17,8 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
 
 - **Event-Driven Architecture (EDA):** Dual-broker strategy utilizing **Mosquitto (MQTT)** for lightweight real-time telemetry ingestion and actuation, and **RabbitMQ (AMQP)** for transactional, guaranteed delivery of critical anomaly alerts and maintenance work orders (Ordens de Serviço).
 - **Three-Tier Data Architecture Separation:** 
-  1. *Configuration:* Relational tables (`equipments`, `sensors`, `gateways`, `rules`).
-  2. *Current State:* Fast $O(1)$ equipment status lookup (`equipment_state`).
+  1. *Configuration & Master Data:* Relational tables (`equipments`, `sensors`, `actuators`, `gateways`, `rule_groups`, `rule_conditions`).
+  2. *Current State & Operational:* Fast $O(1)$ equipment status lookup (`equipment_state`), multi-sensor alert snapshots (`alerts`, `alert_sensor_snapshots`), and maintenance work orders (`work_orders`).
   3. *Historical Stream:* TimescaleDB Hypertable (`telemetry_data`) for high-throughput time-series telemetry scale.
 - **Clean & Hexagonal Architecture:** Strict Separation of Concerns. Core domain business logic is decoupled from frameworks, ensuring testability and longevity.
 - **Quality Assurance & Verification:** Comprehensive unit and integration test coverage using JUnit 5, Mockito, and Testcontainers.
@@ -81,7 +81,7 @@ We follow an iterative milestone roadmap. Documented below is our current develo
 | :--- | :--- | :---: |
 | **Milestone 1** | **Infra & Ingestion Pipeline:** Docker Compose setup (TimescaleDB, Mosquitto, RabbitMQ) + Python Motor Simulator | COMPLETED ✅ |
 | **Milestone 2** | **Database & Data Modeling:** TimescaleDB Hypertables, 3-Tier Schema (Config/State/History), Flyway Migrations | COMPLETED ✅ |
-| **Milestone 3** | **Core Domain & Clean Architecture:** Pure Java Domain Model, Gateway & Rules Engine, Async Consumers | IN PROGRESS ⏳ |
+| **Milestone 3** | **Core Domain & Clean Architecture:** Pure Java Domain Entities, JPA Entities & Mappers, Rules Engine, Async Consumers | IN PROGRESS ⏳ |
 | **Milestone 4** | **Frontend Integration & Real-Time:** Angular Dashboard, RxJS State, WebSockets / SSE streaming | PLANNED 📋 |
 | **Milestone 5** | **Actuation & Feedback Loop:** Bi-directional MQTT commands (Emergency stop, speed throttling) | PLANNED 📋 |
 | **Milestone 6** | **HVAC Control & Thermal Module:** Native internal HVAC thermal management engine | PLANNED 📋 |

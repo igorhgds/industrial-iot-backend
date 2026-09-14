@@ -2,7 +2,7 @@ package henrique.igor.iiot.domain.entities;
 
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 public class Gateway {
@@ -14,14 +14,14 @@ public class Gateway {
     private String firmwareVersion;
     private GatewayStatus status;
     private Sector sector;
-    private LocalDateTime lastPing;
-    private final LocalDateTime createdAt;
+    private OffsetDateTime lastPing;
+    private final OffsetDateTime createdAt;
 
-    public Gateway(String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, LocalDateTime lastPing){
-        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, status, sector, lastPing, LocalDateTime.now());
+    public Gateway(String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing){
+        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, status, sector, lastPing, OffsetDateTime.now());
     }
 
-    public Gateway(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, LocalDateTime lastPing, LocalDateTime createdAt) {
+    public Gateway(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing, OffsetDateTime createdAt) {
         this.gatewayId = gatewayId;
         this.code = code;
         this.macAddress = macAddress;
@@ -40,6 +40,6 @@ public class Gateway {
     public String getFirmwareVersion() {return firmwareVersion;}
     public GatewayStatus getStatus() {return status;}
     public Sector getSector() {return sector;}
-    public LocalDateTime getLastPing() {return lastPing;}
-    public LocalDateTime getCreatedAt() {return createdAt;}
+    public OffsetDateTime getLastPing() {return lastPing;}
+    public OffsetDateTime getCreatedAt() {return createdAt;}
 }

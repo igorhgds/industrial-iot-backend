@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -39,11 +39,11 @@ public class SensorJpaEntity {
     private EquipmentJpaEntity equipment;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     public SensorJpaEntity(){}
 
-    public SensorJpaEntity(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, EquipmentJpaEntity equipment, LocalDateTime createdAt) {
+    public SensorJpaEntity(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, EquipmentJpaEntity equipment, OffsetDateTime createdAt) {
         this.sensorId = sensorId;
         this.code = code;
         this.sensorType = sensorType;

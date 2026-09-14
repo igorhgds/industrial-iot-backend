@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -22,11 +22,11 @@ public class SectorJpaEntity {
     private String description;
 
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private OffsetDateTime createdAt;
 
     public SectorJpaEntity(){}
 
-    public SectorJpaEntity(UUID sectorId, String name, String description, LocalDateTime createdAt) {
+    public SectorJpaEntity(UUID sectorId, String name, String description, OffsetDateTime createdAt) {
         this.sectorId = sectorId;
         this.name = name;
         this.description = description;

@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Entity
@@ -23,16 +23,18 @@ public class EquipmentStateJpaEntity {
     private EquipmentJpaEntity equipment;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private HealthStatus status;
 
     @Column(columnDefinition = "jsonb")
     private String lastPayload;
 
-    private LocalDateTime updatedAt;
+    @Column(nullable = false, updatable = false)
+    private OffsetDateTime updatedAt;
 
     public EquipmentStateJpaEntity(){}
 
-    public EquipmentStateJpaEntity(EquipmentJpaEntity equipment, HealthStatus status, String lastPayload, LocalDateTime updatedAt) {
+    public EquipmentStateJpaEntity(EquipmentJpaEntity equipment, HealthStatus status, String lastPayload, OffsetDateTime updatedAt) {
         this.equipment = equipment;
         this.status = status;
         this.lastPayload = lastPayload;
