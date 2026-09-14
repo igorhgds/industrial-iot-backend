@@ -30,6 +30,7 @@ public class GatewayJpaEntity {
     private String firmwareVersion;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private GatewayStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)

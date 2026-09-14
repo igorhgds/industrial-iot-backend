@@ -16,8 +16,8 @@ public class Equipment {
     private Gateway gateway;
     private final OffsetDateTime createdAt;
 
-    public Equipment(String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway) {
-        this(UUID.randomUUID(), equipCode, type, status, sector, gateway, OffsetDateTime.now());
+    public Equipment(String equipCode, EquipType type, Sector sector, Gateway gateway) {
+        this(UUID.randomUUID(), equipCode, type, EquipStatus.ACTIVE, sector, gateway, OffsetDateTime.now());
     }
 
     public Equipment(UUID equipmentId, String equipCode, EquipType type, EquipStatus status, Sector sector, Gateway gateway, OffsetDateTime createdAt) {

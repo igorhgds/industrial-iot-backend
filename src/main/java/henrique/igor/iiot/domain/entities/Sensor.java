@@ -18,8 +18,8 @@ public class Sensor {
     private Equipment equipment;
     private final OffsetDateTime createdAt;
 
-    public Sensor(String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, Equipment equipment) {
-        this(UUID.randomUUID(), code , sensorType, status, unitOfMeasure, mqttTopic, equipment, OffsetDateTime.now());
+    public Sensor(String code, SensorType sensorType, String unitOfMeasure, String mqttTopic, Equipment equipment) {
+        this(UUID.randomUUID(), code , sensorType, SensorStatus.ONLINE, unitOfMeasure, mqttTopic, equipment, OffsetDateTime.now());
     }
 
     public Sensor(UUID sensorId, String code, SensorType sensorType, SensorStatus status, String unitOfMeasure, String mqttTopic, Equipment equipment, OffsetDateTime createdAt) {

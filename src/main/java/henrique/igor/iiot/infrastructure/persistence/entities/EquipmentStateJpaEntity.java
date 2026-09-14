@@ -23,11 +23,13 @@ public class EquipmentStateJpaEntity {
     private EquipmentJpaEntity equipment;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private HealthStatus status;
 
     @Column(columnDefinition = "jsonb")
     private String lastPayload;
 
+    @Column(nullable = false, updatable = false)
     private OffsetDateTime updatedAt;
 
     public EquipmentStateJpaEntity(){}

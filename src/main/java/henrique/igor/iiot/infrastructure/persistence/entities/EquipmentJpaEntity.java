@@ -1,6 +1,5 @@
 package henrique.igor.iiot.infrastructure.persistence.entities;
 
-import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import jakarta.persistence.*;

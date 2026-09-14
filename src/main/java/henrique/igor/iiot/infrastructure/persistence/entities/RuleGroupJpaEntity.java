@@ -14,9 +14,11 @@ import java.util.*;
 @Getter
 @Setter
 public class RuleGroupJpaEntity {
+
     @Id
     private UUID ruleGroupId;
 
+    @Column(nullable = false)
     private String name;
 
     private String description;
@@ -26,13 +28,17 @@ public class RuleGroupJpaEntity {
     private EquipmentJpaEntity equipment;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Severity severity;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private LogicalOperator operatorType;
 
+    @Column(nullable = false)
     private Boolean isActive;
 
+    @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "ruleGroup", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

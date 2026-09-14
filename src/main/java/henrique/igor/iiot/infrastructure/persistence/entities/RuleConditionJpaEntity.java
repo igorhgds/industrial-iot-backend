@@ -26,8 +26,10 @@ public class RuleConditionJpaEntity {
     private SensorJpaEntity sensor;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private ComparisonOperator operator;
 
+    @Column(nullable = false)
     private BigDecimal thresholdValue;
 
     public RuleConditionJpaEntity(){}

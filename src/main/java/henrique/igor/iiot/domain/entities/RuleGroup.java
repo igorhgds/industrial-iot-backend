@@ -17,8 +17,8 @@ public class RuleGroup {
     private Boolean isActive;
     private final OffsetDateTime createdAt;
 
-    public RuleGroup(String name, String description, Equipment equipment, Severity severity, LogicalOperator operatorType, Boolean isActive){
-        this(UUID.randomUUID(), name, description, equipment, severity, operatorType, isActive, OffsetDateTime.now());
+    public RuleGroup(String name, String description, Equipment equipment, LogicalOperator operatorType, Boolean isActive){
+        this(UUID.randomUUID(), name, description, equipment, Severity.REGULAR, operatorType, isActive, OffsetDateTime.now());
     }
 
     public RuleGroup(UUID ruleGroupId, String name, String description, Equipment equipment, Severity severity, LogicalOperator operatorType, Boolean isActive, OffsetDateTime createdAt) {

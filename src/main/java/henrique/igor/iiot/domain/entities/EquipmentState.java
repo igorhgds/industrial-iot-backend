@@ -6,7 +6,7 @@ import java.time.OffsetDateTime;
 
 public class EquipmentState {
 
-    private Equipment equipmentId;
+    private final Equipment equipmentId;
     private HealthStatus status;
     private String lastPayload;
     private OffsetDateTime updatedAt;
