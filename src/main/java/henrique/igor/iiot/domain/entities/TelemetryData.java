@@ -10,12 +10,10 @@ public class TelemetryData {
     private final BigDecimal value;
     private final String rawPayload;
 
-    // Factory / Constructor para novas leituras da aplicação
     public TelemetryData(Sensor sensor, BigDecimal value, String rawPayload) {
         this(sensor, OffsetDateTime.now(), value, rawPayload);
     }
 
-    // Constructor completo para reconstituição do banco
     public TelemetryData(Sensor sensor, OffsetDateTime timestamp, BigDecimal value, String rawPayload) {
         this.sensor = sensor;
         this.timestamp = timestamp;

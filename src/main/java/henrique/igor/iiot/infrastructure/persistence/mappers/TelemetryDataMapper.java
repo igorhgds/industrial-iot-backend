@@ -1,6 +1,7 @@
 package henrique.igor.iiot.infrastructure.persistence.mappers;
 
-import henrique.igor.iiot.domain.entities.*;
+import henrique.igor.iiot.domain.entities.Sensor;
+import henrique.igor.iiot.domain.entities.TelemetryData;
 import henrique.igor.iiot.infrastructure.persistence.entities.*;
 
 import java.time.OffsetDateTime;
@@ -11,10 +12,7 @@ public class TelemetryDataMapper {
     public static TelemetryDataJpaEntity toJpaEntity(TelemetryData domain) {
         if (domain == null) return null;
 
-        SensorJpaEntity sensorJpa = domain.getSensor() != null
-                ? SensorMapper.toJpaEntity(domain.getSensor())
-                : null;
-
+        SensorJpaEntity sensorJpa = domain.getSensor() != null ? SensorMapper.toJpaEntity(domain.getSensor()) : null;
         UUID sensorId = domain.getSensor() != null ? domain.getSensor().getSensorId() : null;
         TelemetryDataId id = new TelemetryDataId(sensorId, domain.getTimestamp());
 
@@ -29,13 +27,8 @@ public class TelemetryDataMapper {
     public static TelemetryData toDomain(TelemetryDataJpaEntity jpaEntity) {
         if (jpaEntity == null) return null;
 
-        Sensor sensorDomain = jpaEntity.getSensor() != null
-                ? SensorMapper.toDomain(jpaEntity.getSensor())
-                : null;
-
-        OffsetDateTime timestamp = jpaEntity.getId() != null
-                ? jpaEntity.getId().getTimestamp()
-                : null;
+        Sensor sensorDomain = jpaEntity.getSensor() != null ? SensorMapper.toDomain(jpaEntity.getSensor()) : null;
+        OffsetDateTime timestamp = jpaEntity.getId() != null ? jpaEntity.getId().getTimestamp() : null;
 
         return new TelemetryData(
                 sensorDomain,
