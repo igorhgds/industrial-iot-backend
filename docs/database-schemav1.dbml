@@ -35,13 +35,27 @@ Enum sensor_type {
   VOLTAGE
   TEMPERATURE
   VIBRATION
-  ACTUATOR
 }
 
 Enum sensor_status {
   ONLINE
   OFFLINE
   ERROR
+}
+
+Enum actuator_type {
+  HVAC_COOLING
+  LIGHTING
+  EXHAUST_FAN
+  EMERGENCY_STOP
+  VALVE
+}
+
+Enum actuator_status {
+  OFF
+  ON
+  FAULT
+  MAINTENANCE
 }
 
 Enum alert_severity {
@@ -74,6 +88,13 @@ Enum rule_condition {
   GREATER_THAN
   LESS_THAN
   EQUALS
+  GREATER_THAN_OR_EQUAL
+  LESS_THAN_OR_EQUAL
+}
+
+Enum rule_operator {
+  AND
+  OR
 }
 
 Enum rule_action_type {
@@ -135,11 +156,20 @@ Table sensors {
   code varchar [not null, note: 'Ex: SENS-TEMP-01, SENS-VIB-02']
   sensor_type sensor_type [not null]
   unit_of_measure varchar [note: 'A, V, °C, mm/s, BINARY']
-  min_threshold float [note: 'Limite mínimo para alerta']
-  max_threshold float [note: 'Limite máximo para alerta']
   status sensor_status [default: 'ONLINE']
   mqtt_topic varchar [note: 'Tópico do broker MQTT para escuta do sensor']
   created_at timestamptz [default: `now()`]
+}
+
+Table actuators {
+  id uuid [pk, default: `gen_random_uuid()`]
+  code varchar(50) [unique, not null, note: 'Ex: ACT-FAN-01']
+  actuator_type actuator_type [not null]
+  status actuator_status [not null, default: 'OFF']
+  command_mqtt_topic varchar(255)
+  state_mqtt_topic varchar(255)
+  equipment_id uuid [ref: > equipments.id]
+  created_at timestamptz [not null, default: `now()`]
 }
 
 Table telemetry_data {
@@ -154,17 +184,42 @@ Table telemetry_data {
   }
 }
 
+Table rule_groups {
+  id uuid [pk, default: `gen_random_uuid()`]
+  name varchar(100) [not null, note: 'Ex: Regra Sobreaquecimento Motor 01']
+  description text
+  equipment_id uuid [not null, ref: > equipments.id]
+  severity alert_severity [not null, default: 'WARNING']
+  operator_type rule_operator [not null, default: 'AND']
+  is_active boolean [not null, default: true]
+  created_at timestamptz [not null, default: `now()`]
+}
+
+Table rule_conditions {
+  id uuid [pk, default: `gen_random_uuid()`]
+  rule_group_id uuid [not null, ref: > rule_groups.id]
+  sensor_id uuid [not null, ref: > sensors.id]
+  operator rule_condition [not null]
+  threshold_value decimal(15, 2) [not null]
+}
+
 Table alerts {
   id uuid [pk, default: `gen_random_uuid()`]
-  equipment_id uuid [ref: > equipments.id]
-  sensor_id uuid [ref: > sensors.id]
+  equipment_id uuid [not null, ref: > equipments.id]
+  rule_group_id uuid [ref: > rule_groups.id, note: 'Regra multi-sensor que disparou o alerta']
   severity alert_severity [not null]
   message text [not null]
-  value_at_trigger float [not null]
-  status alert_status [default: 'PENDING']
+  status alert_status [not null, default: 'PENDING']
   acknowledged_by uuid [ref: > users.id]
-  triggered_at timestamptz [default: `now()`]
+  triggered_at timestamptz [not null, default: `now()`]
   resolved_at timestamptz
+}
+
+Table alert_sensor_snapshots {
+  id uuid [pk, default: `gen_random_uuid()`]
+  alert_id uuid [not null, ref: > alerts.id]
+  sensor_id uuid [not null, ref: > sensors.id]
+  value_at_trigger decimal(15, 2) [not null]
 }
 
 Table work_orders {
@@ -175,8 +230,8 @@ Table work_orders {
   title varchar [not null]
   description text
   priority work_order_priority [default: 'MEDIUM']
-  status work_order_status [default: 'OPEN']
-  created_at timestamptz [default: `now()`]
+  status work_order_status [not null, default: 'OPEN']
+  created_at timestamptz [not null, default: `now()`]
   closed_at timestamptz
 }
 
@@ -187,6 +242,6 @@ Table automation_rules {
   condition rule_condition [not null]
   threshold_value float [not null]
   action_type rule_action_type [not null]
-  target_sensor_id uuid [ref: > sensors.id, note: 'Sensor/Atuador alvo da ação']
+  target_actuator_id uuid [ref: > actuators.id, note: 'Atuador alvo da ação de automação']
   is_active boolean [default: true]
 }
