@@ -6,6 +6,10 @@ import henrique.igor.iiot.infrastructure.persistence.entities.AlertSensorSnapsho
 
 public class AlertSensorSnapshotMapper {
 
+    public static AlertSensorSnapshotJpaEntity toJpaEntity(AlertSensorSnapshot domain){
+        return toJpaEntity(domain, null);
+    }
+
     public static AlertSensorSnapshotJpaEntity toJpaEntity(AlertSensorSnapshot domain, AlertJpaEntity parent){
         if (domain == null) return null;
         return new AlertSensorSnapshotJpaEntity(
