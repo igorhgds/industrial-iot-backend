@@ -5,9 +5,9 @@ spring:
     virtual:
       enabled: true
   datasource:
-    url: jdbc:postgresql://localhost:5432/industrial_iiot_db
-    username: iiot_user
-    password: 135790
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:industrial_iiot_db}
+    username: ${POSTGRES_USER:iiot_user}
+    password: ${POSTGRES_PASSWORD:135790}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:

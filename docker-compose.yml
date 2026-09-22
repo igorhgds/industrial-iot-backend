@@ -3,11 +3,11 @@ services:
     image: timescale/timescaledb:latest-pg16
     container_name: iiot-postgres
     environment:
-      POSTGRES_USER: iiot_user
-      POSTGRES_PASSWORD: 135790
-      POSTGRES_DB: industrial_iiot_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_iiot:/var/lib/postgresql/data
     networks:
@@ -33,8 +33,8 @@ services:
       - "5672:5672"
       - "15672:15672"
     environment:
-      RABBITMQ_DEFAULT_USER: iiot
-      RABBITMQ_DEFAULT_PASS: iiot
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     volumes:
       - rabbitmq_lib:/var/lib/rabbitmq/
       - rabbitmq_log:/var/log/rabbitmq
