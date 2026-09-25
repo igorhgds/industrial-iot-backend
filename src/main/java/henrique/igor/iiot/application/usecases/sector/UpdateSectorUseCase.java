@@ -3,7 +3,9 @@ package henrique.igor.iiot.application.usecases.sector;
 import henrique.igor.iiot.application.usecases.sector.dto.UpdateSectorRequest;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
+import org.springframework.stereotype.Service;
 
+@Service
 public class UpdateSectorUseCase {
 
     private final SectorRepository sectorRepository;

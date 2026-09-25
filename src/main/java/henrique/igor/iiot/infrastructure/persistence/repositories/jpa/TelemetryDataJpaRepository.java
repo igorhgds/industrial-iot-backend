@@ -15,5 +15,5 @@ public interface TelemetryDataJpaRepository extends JpaRepository<TelemetryDataJ
 
     List<TelemetryDataJpaEntity> findByIdSensorIdAndIdTimestampBetween(UUID sensorId, OffsetDateTime start, OffsetDateTime end);
 
-    Optional<TelemetryDataJpaEntity> findFirstByIdSensorIdByIdTimestampDesc(UUID sensorId);
+    Optional<TelemetryDataJpaEntity> findFirstByIdSensorIdOrderByIdTimestampDesc(UUID sensorId);
 }
