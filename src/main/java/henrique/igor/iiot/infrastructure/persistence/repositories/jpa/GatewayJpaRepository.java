@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface GatewayJpaRepository extends JpaRepository<GatewayJpaEntity, UUID> {
 
     Optional<GatewayJpaEntity> findByCode(String code);
+
+    java.util.List<GatewayJpaEntity> findBySectorSectorId(UUID sectorId);
 }

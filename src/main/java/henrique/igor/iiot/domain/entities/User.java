@@ -31,6 +31,25 @@ public class User {
         this.createdAt = createdAt;
     }
 
+    public void updateProfile(String name, String email) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (email != null && !email.isBlank()) {
+            this.email = email;
+        }
+    }
+
+    public void changeRole(UserRole newRole) {
+        if (newRole != null) {
+            this.userRole = newRole;
+        }
+    }
+
+    public void relocateToSector(Sector newSector) {
+        this.sector = newSector;
+    }
+
     public UUID getUserId() {return userId;}
     public String getName() {return name;}
     public String getEmail() {return email;}

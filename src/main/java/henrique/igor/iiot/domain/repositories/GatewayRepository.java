@@ -12,6 +12,8 @@ public interface GatewayRepository {
 
     Optional<Gateway> findByCode(String code);
 
+    List<Gateway> findBySectorId(UUID sectorId);
+
     List<Gateway> findAll();
 
     void deleteById(UUID gatewayId);

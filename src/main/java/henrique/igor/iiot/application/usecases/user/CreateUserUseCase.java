@@ -5,9 +5,7 @@ import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
-import org.springframework.stereotype.Service;
 
-@Service
 public class CreateUserUseCase {
 
     private final UserRepository userRepository;
