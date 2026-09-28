@@ -10,7 +10,7 @@ public class Equipment {
 
     private final UUID equipmentId;
     private final String equipCode;
-    private EquipType type;
+    private final EquipType type;
     private EquipStatus status;
     private Sector sector;
     private Gateway gateway;
@@ -28,6 +28,20 @@ public class Equipment {
         this.sector = sector;
         this.gateway = gateway;
         this.createdAt = createdAt;
+    }
+
+    public void changeStatus(EquipStatus newStatus) {
+        if (newStatus != null) {
+            this.status = newStatus;
+        }
+    }
+
+    public void relocateToSector(Sector newSector) {
+        this.sector = newSector;
+    }
+
+    public void connectToGateway(Gateway newGateway) {
+        this.gateway = newGateway;
     }
 
     public UUID getEquipmentId() {return equipmentId;}

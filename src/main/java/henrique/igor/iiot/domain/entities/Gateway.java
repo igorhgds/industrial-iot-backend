@@ -18,7 +18,7 @@ public class Gateway {
     private final OffsetDateTime createdAt;
 
     public Gateway(String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing){
-        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, status, sector, lastPing, OffsetDateTime.now());
+        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, status != null ? status : GatewayStatus.OFFLINE, sector, lastPing, OffsetDateTime.now());
     }
 
     public Gateway(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing, OffsetDateTime createdAt) {
@@ -31,6 +31,33 @@ public class Gateway {
         this.sector = sector;
         this.lastPing = lastPing;
         this.createdAt = createdAt;
+    }
+
+    public void registerPing(OffsetDateTime pingTime) {
+        this.lastPing = pingTime;
+        this.status = GatewayStatus.ONLINE;
+    }
+
+    public void updateFirmware(String newVersion) {
+        if (newVersion != null && !newVersion.isBlank()) {
+            this.firmwareVersion = newVersion;
+        }
+    }
+
+    public void updateIpAddress(String newIp) {
+        if (newIp != null && !newIp.isBlank()) {
+            this.ipAddress = newIp;
+        }
+    }
+
+    public void changeStatus(GatewayStatus newStatus) {
+        if (newStatus != null) {
+            this.status = newStatus;
+        }
+    }
+
+    public void relocateToSector(Sector newSector) {
+        this.sector = newSector;
     }
 
     public UUID getGatewayId(){return gatewayId;}

@@ -38,7 +38,7 @@ public class TelemetryDataPersistenceAdapter implements TelemetryDataRepository 
 
     @Override
     public Optional<TelemetryData> findLatestBySensorId(UUID sensorId) {
-        return telemetryDataJpaRepository.findFirstByIdSensorIdByIdTimestampDesc(sensorId)
+        return telemetryDataJpaRepository.findFirstByIdSensorIdOrderByIdTimestampDesc(sensorId)
                 .map(TelemetryDataMapper::toDomain);
     }
 }

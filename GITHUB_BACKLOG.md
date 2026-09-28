@@ -126,26 +126,46 @@ Repository: igorhgds/industrial-iot-backend
 
 ## ⚙️ Milestone 3: Core Domain & Clean Architecture
 
-### Issue #5: [M3-US01] Clean Architecture Domain Modeling & Entities
+### Issue #21: [M3-US03] Master Data Use Cases (User, Sector, Gateway, Equipment, Sensor, Actuator)
 - **Type:** Feature / Backend Core
 - **Labels:** `domain`, `m3-core`
 - **Description:**
-  Model core domain entities (`Motor`, `TelemetryValue`, `SensorType`, `AnomalyStatus`) without any Spring framework dependencies (Pure Java).
+  Implement domain business rules and application Use Cases for managing master data entities (Users, Sectors, Gateways, Equipments, Sensors, and Actuators).
 - **Acceptance Criteria:**
-  - [ ] Domain entities encapsulate business validation rules (e.g., max temperature thresholds, vibration spikes).
-  - [ ] Zero Spring/JPA annotations inside domain core package.
-- **Definition of Done (DoD):** 100% pure Java domain model with unit tests.
+  - [ ] User & Sector Use Cases (`CreateUserUseCase`, `CreateSectorUseCase`).
+  - [ ] Gateway & Equipment Use Cases (`RegisterGatewayUseCase`, `RegisterEquipmentUseCase`).
+  - [ ] Sensor & Actuator Use Cases (`RegisterSensorUseCase`, `RegisterActuatorUseCase`).
+- **Definition of Done (DoD):** Pure Java domain core logic with 100% test coverage for domain validations.
 
-### Issue #6: [M3-US02] MQTT Telemetry Consumption & Ingestion Use Case
+### Issue #22: [M3-US04] Telemetry Ingestion & Real-Time Equipment State Use Cases
 - **Type:** Feature / Backend Core
 - **Labels:** `domain`, `m3-core`
 - **Description:**
-  Implement MQTT subscriber/consumer in Spring Boot to ingest incoming sensor payloads, pass to `ProcessTelemetryUseCase`, and persist to PostgreSQL.
+  Implement real-time MQTT telemetry payload ingestion, time-series persistence to TimescaleDB, instant equipment health state updates ($O(1)$), and dynamic rules evaluation trigger.
 - **Acceptance Criteria:**
-  - [ ] Clean Controller / Messaging Adapter delegating to `ProcessTelemetryUseCase`.
-  - [ ] Unit tests for Use Case using Mockito.
-  - [ ] Async ingestion handling without blocking main threads.
-- **Definition of Done (DoD):** Messages published by Python simulator stored in PostgreSQL `telemetry_readings`.
+  - [ ] `ProcessTelemetryIngestionUseCase` implemented for parsing MQTT telemetry, persisting to TimescaleDB, and updating `equipment_state`.
+  - [ ] `TelemetryMqttConsumer` adapter created to receive telemetry payloads from Mosquitto MQTT broker.
+- **Definition of Done (DoD):** Telemetry payload stored in TimescaleDB and equipment state updated dynamically.
+
+### Issue #23: [M3-US05] Dynamic Rules Engine, Alerts & Actuation Use Cases
+- **Type:** Feature / Backend Core
+- **Labels:** `domain`, `m3-core`
+- **Description:**
+  Implement Use Cases for dynamic threshold rule evaluation, automated anomaly alert generation (with sensor snapshot), and closed-loop actuation command dispatching.
+- **Acceptance Criteria:**
+  - [ ] `CreateRuleGroupUseCase`, `AddConditionToRuleGroupUseCase`, and `EvaluateRuleGroupUseCase` created.
+  - [ ] `TriggerAlertUseCase`, `AcknowledgeAlertUseCase`, and `ExecuteActuationCommandUseCase` implemented.
+- **Definition of Done (DoD):** Anomalies trigger alerts with sensor snapshots and dispatch actuation commands.
+
+### Issue #24: [M3-US06] Maintenance Work Order Lifecycle Use Cases
+- **Type:** Feature / Backend Core
+- **Labels:** `domain`, `m3-core`
+- **Description:**
+  Implement Use Cases for managing the complete lifecycle of maintenance Work Orders (Ordens de Serviço), technician assignments, and alert resolution.
+- **Acceptance Criteria:**
+  - [ ] `CreateWorkOrderUseCase` and `AssignWorkOrderUseCase` implemented.
+  - [ ] `UpdateWorkOrderStatusUseCase` and `CloseWorkOrderUseCase` enforcing state machine transitions.
+- **Definition of Done (DoD):** Work Order lifecycle fully functional and validated via unit test suite.
 
 ---
 

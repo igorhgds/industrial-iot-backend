@@ -1,6 +1,7 @@
 package henrique.igor.iiot.infrastructure.persistence.adapters;
 
 import henrique.igor.iiot.domain.entities.Equipment;
+import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.infrastructure.persistence.entities.EquipmentJpaEntity;
 import henrique.igor.iiot.infrastructure.persistence.mappers.EquipmentMapper;
@@ -36,6 +37,16 @@ public class EquipmentPersistenceAdapter implements EquipmentRepository {
     public Optional<Equipment> findByEquipCode(String equipCode) {
         return equipmentJpaRepository.findByEquipCode(equipCode)
                 .map(EquipmentMapper::toDomain);
+    }
+
+    @Override
+    public long countBySectorIdAndType(UUID sectorId, EquipType type) {
+        return equipmentJpaRepository.countBySectorSectorIdAndType(sectorId, type);
+    }
+
+    @Override
+    public long countBySectorIdIsNullAndType(EquipType type) {
+        return equipmentJpaRepository.countBySectorIsNullAndType(type);
     }
 
     @Override
