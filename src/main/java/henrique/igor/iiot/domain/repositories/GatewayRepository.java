@@ -12,6 +12,12 @@ public interface GatewayRepository {
 
     Optional<Gateway> findByCode(String code);
 
+    List<Gateway> findBySectorId(UUID sectorId);
+
+    long countBySectorId(UUID sectorId);
+
+    long countBySectorIdIsNull();
+
     List<Gateway> findAll();
 
     void deleteById(UUID gatewayId);

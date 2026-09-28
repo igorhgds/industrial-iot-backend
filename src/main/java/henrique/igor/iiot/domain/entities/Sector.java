@@ -6,7 +6,7 @@ import java.util.UUID;
 public class Sector {
 
     private final UUID sectorId;
-    private final String name;
+    private String name;
     private String description;
     private final OffsetDateTime createdAt;
 
@@ -19,6 +19,13 @@ public class Sector {
         this.name = name;
         this.description = description;
         this.createdAt = createdAt;
+    }
+
+    public void updateInfo(String name, String description) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        this.description = description;
     }
 
     public UUID getSectorId() {return sectorId;}

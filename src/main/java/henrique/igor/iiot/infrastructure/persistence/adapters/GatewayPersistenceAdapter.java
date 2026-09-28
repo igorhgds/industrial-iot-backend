@@ -38,6 +38,24 @@ public class GatewayPersistenceAdapter implements GatewayRepository {
     }
 
     @Override
+    public List<Gateway> findBySectorId(UUID sectorId) {
+        return gatewayJpaRepository.findBySectorSectorId(sectorId)
+                .stream()
+                .map(GatewayMapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public long countBySectorId(UUID sectorId) {
+        return gatewayJpaRepository.countBySectorSectorId(sectorId);
+    }
+
+    @Override
+    public long countBySectorIdIsNull() {
+        return gatewayJpaRepository.countBySectorIsNull();
+    }
+
+    @Override
     public List<Gateway> findAll() {
         return gatewayJpaRepository.findAll()
                 .stream()
