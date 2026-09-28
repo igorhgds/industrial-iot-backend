@@ -35,7 +35,7 @@ class ListGatewaysBySectorUseCaseTest {
     @Test
     @DisplayName("Should return list of gateways by sector ID when sector exists")
     void shouldReturnGatewaysBySectorIdWhenSectorExists() {
-        // 1. ARRANGE
+        // ARRANGE
         UUID sectorId = UUID.randomUUID();
         Sector sector = new Sector(sectorId, "Stamping Sector", "Description", null);
         Gateway gw1 = new Gateway(UUID.randomUUID(), "GW-01", "MAC-1", "192.168.1.1", "v1", GatewayStatus.ONLINE, sector, null, null);
@@ -44,10 +44,10 @@ class ListGatewaysBySectorUseCaseTest {
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
         when(gatewayRepository.findBySectorId(sectorId)).thenReturn(List.of(gw1, gw2));
 
-        // 2. ACT
+        // ACT
         List<Gateway> actualGateways = listGatewaysBySectorUseCase.execute(sectorId);
 
-        // 3. ASSERT
+        // ASSERT
         assertNotNull(actualGateways);
         assertEquals(2, actualGateways.size());
         assertEquals("GW-01", actualGateways.get(0).getCode());
@@ -60,10 +60,10 @@ class ListGatewaysBySectorUseCaseTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException when sectorId is null")
     void shouldThrowExceptionWhenSectorIdIsNull() {
-        // 1. ARRANGE
+        // ARRANGE
         UUID nullSectorId = null;
 
-        // 2. ACT & 3. ASSERT
+        // ACT & ASSERT
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> listGatewaysBySectorUseCase.execute(nullSectorId)
@@ -77,12 +77,12 @@ class ListGatewaysBySectorUseCaseTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException when sector is not found")
     void shouldThrowExceptionWhenSectorNotFound() {
-        // 1. ARRANGE
+        // ARRANGE
         UUID nonExistentSectorId = UUID.randomUUID();
 
         when(sectorRepository.findById(nonExistentSectorId)).thenReturn(Optional.empty());
 
-        // 2. ACT & 3. ASSERT
+        // ACT & ASSERT
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> listGatewaysBySectorUseCase.execute(nonExistentSectorId)

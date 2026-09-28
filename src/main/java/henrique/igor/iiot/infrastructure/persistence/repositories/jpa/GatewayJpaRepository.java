@@ -13,4 +13,8 @@ public interface GatewayJpaRepository extends JpaRepository<GatewayJpaEntity, UU
     Optional<GatewayJpaEntity> findByCode(String code);
 
     java.util.List<GatewayJpaEntity> findBySectorSectorId(UUID sectorId);
+
+    long countBySectorSectorId(UUID sectorId);
+
+    long countBySectorIsNull();
 }

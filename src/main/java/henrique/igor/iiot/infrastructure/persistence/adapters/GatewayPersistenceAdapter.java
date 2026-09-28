@@ -46,6 +46,16 @@ public class GatewayPersistenceAdapter implements GatewayRepository {
     }
 
     @Override
+    public long countBySectorId(UUID sectorId) {
+        return gatewayJpaRepository.countBySectorSectorId(sectorId);
+    }
+
+    @Override
+    public long countBySectorIdIsNull() {
+        return gatewayJpaRepository.countBySectorIsNull();
+    }
+
+    @Override
     public List<Gateway> findAll() {
         return gatewayJpaRepository.findAll()
                 .stream()

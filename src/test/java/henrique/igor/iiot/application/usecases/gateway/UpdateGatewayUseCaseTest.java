@@ -35,7 +35,7 @@ class UpdateGatewayUseCaseTest {
     @Test
     @DisplayName("Should update gateway successfully using Rich Domain Model methods")
     void shouldUpdateGatewaySuccessfully() {
-        // 1. ARRANGE
+        // ARRANGE
         UUID gatewayId = UUID.randomUUID();
         UUID newSectorId = UUID.randomUUID();
         Sector oldSector = new Sector(UUID.randomUUID(), "Old Sector", "Desc", null);
@@ -45,10 +45,10 @@ class UpdateGatewayUseCaseTest {
 
         UpdateGatewayRequest request = new UpdateGatewayRequest(
                 gatewayId,
-                "192.168.1.200", // Novo IP
-                "v2.0.0",        // Nova versão
-                GatewayStatus.ONLINE, // Novo status
-                newSectorId,       // Novo setor
+                "192.168.1.200",
+                "v2.0.0",
+                GatewayStatus.ONLINE,
+                newSectorId,
                 null
         );
 
@@ -56,10 +56,10 @@ class UpdateGatewayUseCaseTest {
         when(sectorRepository.findById(newSectorId)).thenReturn(Optional.of(newSector));
         when(gatewayRepository.save(any(Gateway.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // 2. ACT
+        // ACT
         Gateway updatedGateway = updateGatewayUseCase.execute(request);
 
-        // 3. ASSERT
+        // ASSERT
         assertNotNull(updatedGateway);
         assertEquals(gatewayId, updatedGateway.getGatewayId());
         assertEquals("192.168.1.200", updatedGateway.getIpAddress());
@@ -75,13 +75,13 @@ class UpdateGatewayUseCaseTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException when gateway does not exist")
     void shouldThrowExceptionWhenGatewayNotFound() {
-        // 1. ARRANGE
+        // ARRANGE
         UUID nonExistentId = UUID.randomUUID();
         UpdateGatewayRequest request = new UpdateGatewayRequest(nonExistentId, "192.168.1.2", "v1.1", GatewayStatus.ONLINE, null, null);
 
         when(gatewayRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
-        // 2. ACT & 3. ASSERT
+        // ACT & ASSERT
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> updateGatewayUseCase.execute(request)
@@ -95,7 +95,7 @@ class UpdateGatewayUseCaseTest {
     @Test
     @DisplayName("Should throw IllegalArgumentException when new sector is not found")
     void shouldThrowExceptionWhenNewSectorNotFound() {
-        // 1. ARRANGE
+        // ARRANGE
         UUID gatewayId = UUID.randomUUID();
         UUID invalidSectorId = UUID.randomUUID();
         Gateway existingGateway = new Gateway(gatewayId, "GW-01", "AA:BB:CC:DD:EE:FF", "192.168.1.1", "v1.0.0", GatewayStatus.OFFLINE, null, null, null);
@@ -105,7 +105,7 @@ class UpdateGatewayUseCaseTest {
         when(gatewayRepository.findById(gatewayId)).thenReturn(Optional.of(existingGateway));
         when(sectorRepository.findById(invalidSectorId)).thenReturn(Optional.empty());
 
-        // 2. ACT & 3. ASSERT
+        // ACT & ASSERT
         IllegalArgumentException exception = assertThrows(
                 IllegalArgumentException.class,
                 () -> updateGatewayUseCase.execute(request)

@@ -17,17 +17,23 @@ public class RegisterGatewayUseCase {
     }
 
     public Gateway execute(RegisterGatewayRequest request){
-        if(gatewayRepository.findByCode(request.code()).isPresent()){
-            throw new IllegalArgumentException("Gateway with code " + request.code() + " already exists.");
-        }
         Sector sector = null;
         if (request.sectorId() != null) {
             sector = sectorRepository.findById(request.sectorId())
                     .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + request.sectorId()));
         }
 
+        String gatewayCode = request.code();
+        if (gatewayCode == null || gatewayCode.isBlank()) {
+            gatewayCode = generateGatewayCode(sector);
+        } else {
+            if (gatewayRepository.findByCode(gatewayCode).isPresent()) {
+                throw new IllegalArgumentException("Gateway with code " + gatewayCode + " already exists.");
+            }
+        }
+
         Gateway newGateway = new Gateway(
-                request.code(),
+                gatewayCode,
                 request.macAddress(),
                 request.ipAddress(),
                 request.firmwareVersion(),
@@ -37,5 +43,25 @@ public class RegisterGatewayUseCase {
         );
 
         return gatewayRepository.save(newGateway);
+    }
+
+    private String generateGatewayCode(Sector sector) {
+        String prefix = "GEN";
+        long count;
+
+        if (sector != null && sector.getName() != null && !sector.getName().isBlank()) {
+            String cleanName = sector.getName().replaceAll("[^a-zA-Z0-9]", "").toUpperCase();
+            if (cleanName.length() >= 3) {
+                prefix = cleanName.substring(0, 3);
+            } else {
+                prefix = cleanName;
+            }
+            count = gatewayRepository.countBySectorId(sector.getSectorId());
+        } else {
+            count = gatewayRepository.countBySectorIdIsNull();
+        }
+
+        String sequence = String.format("%03d", count + 1);
+        return "GW-" + prefix + "-" + sequence;
     }
 }
