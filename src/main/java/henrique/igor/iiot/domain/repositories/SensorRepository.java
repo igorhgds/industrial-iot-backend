@@ -1,6 +1,7 @@
 package henrique.igor.iiot.domain.repositories;
 
 import henrique.igor.iiot.domain.entities.Sensor;
+import henrique.igor.iiot.domain.entities.enums.SensorType;
 
 import java.util.*;
 
@@ -14,5 +15,11 @@ public interface SensorRepository {
 
     List<Sensor> findAll();
 
+    List<Sensor> findByEquipmentId(UUID equipmentId);
+
     void deleteById(UUID sensorId);
+
+    long countByEquipmentIdAndSensorType(UUID equipmentId, SensorType sensorType);
+
+    long countByEquipmentIdIsNullAndSensorType(SensorType sensorType);
 }

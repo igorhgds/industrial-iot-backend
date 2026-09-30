@@ -10,7 +10,7 @@ import java.util.UUID;
 public class Sensor {
 
     private final UUID sensorId;
-    private final String code;
+    private String code;
     private final SensorType sensorType;
     private SensorStatus status;
     private final String unitOfMeasure;
@@ -31,6 +31,25 @@ public class Sensor {
         this.mqttTopic = mqttTopic;
         this.equipment = equipment;
         this.createdAt = createdAt;
+    }
+
+    public void changeStatus(SensorStatus newStatus){
+        if(newStatus != null){
+            this.status = newStatus;
+        }
+    }
+
+    public void updateMqttTopic(String newMqttTopic) {
+        if (newMqttTopic != null && !newMqttTopic.isBlank()) {
+            this.mqttTopic = newMqttTopic;
+        }
+    }
+
+    public void relocateToEquipment(Equipment newEquipment, String newCode) {
+        this.equipment = newEquipment;
+        if (newCode != null && !newCode.isBlank()) {
+            this.code = newCode;
+        }
     }
 
     public UUID getSensorId() {return sensorId;}
