@@ -20,6 +20,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import henrique.igor.iiot.domain.services.GatewayCodeGenerator;
+import org.junit.jupiter.api.BeforeEach;
+
 @ExtendWith(MockitoExtension.class)
 class RegisterGatewayUseCaseTest {
 
@@ -29,8 +32,15 @@ class RegisterGatewayUseCaseTest {
     @Mock
     private SectorRepository sectorRepository;
 
-    @InjectMocks
+    private GatewayCodeGenerator gatewayCodeGenerator;
+
     private RegisterGatewayUseCase registerGatewayUseCase;
+
+    @BeforeEach
+    void setUp() {
+        gatewayCodeGenerator = new GatewayCodeGenerator(gatewayRepository);
+        registerGatewayUseCase = new RegisterGatewayUseCase(gatewayRepository, sectorRepository, gatewayCodeGenerator);
+    }
 
     @Test
     @DisplayName("Should register gateway successfully when sector is provided and valid")
