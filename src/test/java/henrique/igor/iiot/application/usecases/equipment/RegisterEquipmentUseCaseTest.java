@@ -24,6 +24,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+import henrique.igor.iiot.domain.services.EquipmentCodeGenerator;
+import org.junit.jupiter.api.BeforeEach;
+
 @ExtendWith(MockitoExtension.class)
 class RegisterEquipmentUseCaseTest {
 
@@ -36,8 +39,15 @@ class RegisterEquipmentUseCaseTest {
     @Mock
     private GatewayRepository gatewayRepository;
 
-    @InjectMocks
+    private EquipmentCodeGenerator equipmentCodeGenerator;
+
     private RegisterEquipmentUseCase registerEquipmentUseCase;
+
+    @BeforeEach
+    void setUp() {
+        equipmentCodeGenerator = new EquipmentCodeGenerator(equipmentRepository);
+        registerEquipmentUseCase = new RegisterEquipmentUseCase(equipmentRepository, sectorRepository, gatewayRepository, equipmentCodeGenerator);
+    }
 
     @Test
     @DisplayName("Should register equipment with manual equipCode successfully")

@@ -1,5 +1,6 @@
 package henrique.igor.iiot.infrastructure.persistence.adapters;
 
+import henrique.igor.iiot.domain.entities.enums.SensorType;
 import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
 import henrique.igor.iiot.infrastructure.persistence.entities.SensorJpaEntity;
@@ -46,7 +47,25 @@ public class SensorPersistenceAdapter implements SensorRepository {
     }
 
     @Override
+    public List<Sensor> findByEquipmentId(UUID equipmentId) {
+        return sensorJpaRepository.findByEquipmentEquipmentId(equipmentId)
+                .stream()
+                .map(SensorMapper::toDomain)
+                .toList();
+    }
+
+    @Override
     public void deleteById(UUID sensorId) {
         sensorJpaRepository.deleteById(sensorId);
+    }
+
+    @Override
+    public long countByEquipmentIdAndSensorType(UUID equipmentId, SensorType sensorType) {
+        return sensorJpaRepository.countByEquipment_EquipmentIdAndSensorType(equipmentId, sensorType);
+    }
+
+    @Override
+    public long countByEquipmentIdIsNullAndSensorType(SensorType sensorType) {
+        return sensorJpaRepository.countByEquipmentIsNullAndSensorType(sensorType);
     }
 }

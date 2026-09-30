@@ -5,5 +5,5 @@ public enum SensorType {
     VOLTAGE,
     TEMPERATURE,
     VIBRATION,
-    ACTUATOR
+    PRESSURE
 }
