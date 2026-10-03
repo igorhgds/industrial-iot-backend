@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.sensor;
 
-import henrique.igor.iiot.application.usecases.sensor.dto.UpdateSensorRequest;
+import henrique.igor.iiot.application.usecases.sensor.dto.UpdateSensorInput;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
@@ -24,23 +24,23 @@ public class UpdateSensorUseCase {
         this.sensorCodeGenerator = sensorCodeGenerator;
     }
 
-    public Sensor execute(UpdateSensorRequest request) {
-        Sensor sensor = sensorRepository.findById(request.sensorId())
-                .orElseThrow(() -> new IllegalArgumentException("Sensor not found with ID: " + request.sensorId()));
+    public Sensor execute(UpdateSensorInput input) {
+        Sensor sensor = sensorRepository.findById(input.sensorId())
+                .orElseThrow(() -> new IllegalArgumentException("Sensor not found with ID: " + input.sensorId()));
 
-        if (request.status() != null) {
-            sensor.changeStatus(request.status());
+        if (input.status() != null) {
+            sensor.changeStatus(input.status());
         }
 
-        if (request.mqttTopic() != null) {
-            sensor.updateMqttTopic(request.mqttTopic());
+        if (input.mqttTopic() != null) {
+            sensor.updateMqttTopic(input.mqttTopic());
         }
 
-        if (request.equipmentId() != null) {
+        if (input.equipmentId() != null) {
             UUID currentEquipId = sensor.getEquipment() != null ? sensor.getEquipment().getEquipmentId() : null;
-            if (!Objects.equals(currentEquipId, request.equipmentId())) {
-                Equipment newEquipment = equipmentRepository.findById(request.equipmentId())
-                        .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + request.equipmentId()));
+            if (!Objects.equals(currentEquipId, input.equipmentId())) {
+                Equipment newEquipment = equipmentRepository.findById(input.equipmentId())
+                        .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + input.equipmentId()));
 
                 String newCode = sensorCodeGenerator.generate(sensor.getSensorType(), newEquipment);
                 sensor.relocateToEquipment(newEquipment, newCode);

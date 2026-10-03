@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.sector;
 
-import henrique.igor.iiot.application.usecases.sector.dto.CreateSectorRequest;
+import henrique.igor.iiot.application.usecases.sector.dto.CreateSectorInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 
@@ -12,14 +12,14 @@ public class CreateSectorUseCase {
         this.sectorRepository = sectorRepository;
     }
 
-    public Sector execute(CreateSectorRequest request){
-        if (sectorRepository.findByName(request.name()).isPresent()){
-            throw new IllegalArgumentException("Sector with name " + request.name() + " already exists.");
+    public Sector execute(CreateSectorInput input){
+        if (sectorRepository.findByName(input.name()).isPresent()){
+            throw new IllegalArgumentException("Sector with name " + input.name() + " already exists.");
         }
 
         Sector newSector = new Sector(
-                request.name(),
-                request.description()
+                input.name(),
+                input.description()
         );
 
         return sectorRepository.save(newSector);

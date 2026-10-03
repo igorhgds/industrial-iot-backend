@@ -4,7 +4,7 @@ import henrique.igor.iiot.domain.entities.enums.UserRole;
 
 import java.util.UUID;
 
-public record UpdateUserRequest(
+public record UpdateUserInput(
         UUID userId,
         String name,
         String email,

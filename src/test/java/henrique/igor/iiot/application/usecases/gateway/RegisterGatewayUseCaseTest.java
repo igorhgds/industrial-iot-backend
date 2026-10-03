@@ -1,11 +1,12 @@
 package henrique.igor.iiot.application.usecases.gateway;
 
-import henrique.igor.iiot.application.usecases.gateway.dto.RegisterGatewayRequest;
+import henrique.igor.iiot.application.usecases.gateway.dto.RegisterGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
+import henrique.igor.iiot.domain.services.GatewayCodeGenerator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,9 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-import henrique.igor.iiot.domain.services.GatewayCodeGenerator;
-import org.junit.jupiter.api.BeforeEach;
-
 @ExtendWith(MockitoExtension.class)
 class RegisterGatewayUseCaseTest {
 
@@ -32,15 +30,11 @@ class RegisterGatewayUseCaseTest {
     @Mock
     private SectorRepository sectorRepository;
 
+    @Mock
     private GatewayCodeGenerator gatewayCodeGenerator;
 
+    @InjectMocks
     private RegisterGatewayUseCase registerGatewayUseCase;
-
-    @BeforeEach
-    void setUp() {
-        gatewayCodeGenerator = new GatewayCodeGenerator(gatewayRepository);
-        registerGatewayUseCase = new RegisterGatewayUseCase(gatewayRepository, sectorRepository, gatewayCodeGenerator);
-    }
 
     @Test
     @DisplayName("Should register gateway successfully when sector is provided and valid")
@@ -49,7 +43,7 @@ class RegisterGatewayUseCaseTest {
         UUID sectorId = UUID.randomUUID();
         Sector sector = new Sector(sectorId, "Stamping Line", "Description", null);
 
-        RegisterGatewayRequest request = new RegisterGatewayRequest(
+        RegisterGatewayInput request = new RegisterGatewayInput(
                 "GW-ST-01",
                 "AA:BB:CC:DD:EE:01",
                 "192.168.1.100",
@@ -84,7 +78,7 @@ class RegisterGatewayUseCaseTest {
     @DisplayName("Should register gateway successfully when sectorId is null")
     void shouldRegisterGatewaySuccessfullyWithoutSector() {
         // ARRANGE
-        RegisterGatewayRequest request = new RegisterGatewayRequest(
+        RegisterGatewayInput request = new RegisterGatewayInput(
                 "GW-STANDALONE",
                 "AA:BB:CC:DD:EE:02",
                 "192.168.1.101",
@@ -113,7 +107,7 @@ class RegisterGatewayUseCaseTest {
     @DisplayName("Should throw IllegalArgumentException when gateway code already exists")
     void shouldThrowExceptionWhenCodeAlreadyExists() {
         // ARRANGE
-        RegisterGatewayRequest request = new RegisterGatewayRequest(
+        RegisterGatewayInput request = new RegisterGatewayInput(
                 "GW-DUPLICATE",
                 "AA:BB:CC:DD:EE:03",
                 "192.168.1.102",
@@ -141,7 +135,7 @@ class RegisterGatewayUseCaseTest {
     void shouldThrowExceptionWhenSectorNotFound() {
         // ARRANGE
         UUID nonExistentSectorId = UUID.randomUUID();
-        RegisterGatewayRequest request = new RegisterGatewayRequest(
+        RegisterGatewayInput request = new RegisterGatewayInput(
                 "GW-INVALID-SECTOR",
                 "AA:BB:CC:DD:EE:04",
                 "192.168.1.103",
@@ -170,7 +164,7 @@ class RegisterGatewayUseCaseTest {
         UUID sectorId = UUID.randomUUID();
         Sector sector = new Sector(sectorId, "Usinagem", "Sector Usinagem", null);
 
-        RegisterGatewayRequest request = new RegisterGatewayRequest(
+        RegisterGatewayInput request = new RegisterGatewayInput(
                 null, // Code nulo -> aciona geração automática
                 "AA:BB:CC:DD:EE:05",
                 "192.168.1.105",
@@ -180,7 +174,7 @@ class RegisterGatewayUseCaseTest {
         );
 
         when(sectorRepository.findById(sectorId)).thenReturn(Optional.of(sector));
-        when(gatewayRepository.countBySectorId(sectorId)).thenReturn(2L);
+        when(gatewayCodeGenerator.generate(sector)).thenReturn("GW-USI-003");
         when(gatewayRepository.save(any(Gateway.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // 2. ACT
@@ -188,11 +182,11 @@ class RegisterGatewayUseCaseTest {
 
         // 3. ASSERT
         assertNotNull(createdGateway);
-        assertEquals("GW-USI-003", createdGateway.getCode()); // GW + USI + (2 + 1 = 003)
+        assertEquals("GW-USI-003", createdGateway.getCode());
         assertEquals(sector, createdGateway.getSector());
 
         verify(sectorRepository, times(1)).findById(sectorId);
-        verify(gatewayRepository, times(1)).countBySectorId(sectorId);
+        verify(gatewayCodeGenerator, times(1)).generate(sector);
         verify(gatewayRepository, never()).findByCode(any());
         verify(gatewayRepository, times(1)).save(any(Gateway.class));
     }

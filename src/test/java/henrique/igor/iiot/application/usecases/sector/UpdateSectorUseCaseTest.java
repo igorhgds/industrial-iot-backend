@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.sector;
 
-import henrique.igor.iiot.application.usecases.sector.dto.UpdateSectorRequest;
+import henrique.igor.iiot.application.usecases.sector.dto.UpdateSectorInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -35,7 +35,7 @@ class UpdateSectorUseCaseTest {
         OffsetDateTime createdAt = OffsetDateTime.now().minusDays(10);
         Sector existingSector = new Sector(sectorId, "Machining Line", "Old description", createdAt);
 
-        UpdateSectorRequest request = new UpdateSectorRequest(
+        UpdateSectorInput request = new UpdateSectorInput(
                 sectorId,
                 "Machining Line",
                 "Updated description with new details"
@@ -67,7 +67,7 @@ class UpdateSectorUseCaseTest {
         OffsetDateTime createdAt = OffsetDateTime.now().minusDays(5);
         Sector existingSector = new Sector(sectorId, "Old Line Name", "Description", createdAt);
 
-        UpdateSectorRequest request = new UpdateSectorRequest(
+        UpdateSectorInput request = new UpdateSectorInput(
                 sectorId,
                 "New Line Name",
                 "Updated description"
@@ -97,7 +97,7 @@ class UpdateSectorUseCaseTest {
     void shouldThrowExceptionWhenSectorDoesNotExist() {
         // ARRANGE
         UUID nonExistentId = UUID.randomUUID();
-        UpdateSectorRequest request = new UpdateSectorRequest(nonExistentId, "Sector Name", "Description");
+        UpdateSectorInput request = new UpdateSectorInput(nonExistentId, "Sector Name", "Description");
 
         when(sectorRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
@@ -120,7 +120,7 @@ class UpdateSectorUseCaseTest {
         Sector existingSector = new Sector(sectorId, "Line A", "Description A", OffsetDateTime.now());
         Sector anotherSector = new Sector(UUID.randomUUID(), "Line B", "Description B", OffsetDateTime.now());
 
-        UpdateSectorRequest request = new UpdateSectorRequest(
+        UpdateSectorInput request = new UpdateSectorInput(
                 sectorId,
                 "Line B",
                 "New Description"

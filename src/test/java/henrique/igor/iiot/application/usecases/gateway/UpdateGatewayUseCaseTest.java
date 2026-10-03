@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.gateway;
 
-import henrique.igor.iiot.application.usecases.gateway.dto.UpdateGatewayRequest;
+import henrique.igor.iiot.application.usecases.gateway.dto.UpdateGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
@@ -43,7 +43,7 @@ class UpdateGatewayUseCaseTest {
 
         Gateway existingGateway = new Gateway(gatewayId, "GW-01", "AA:BB:CC:DD:EE:FF", "192.168.1.1", "v1.0.0", GatewayStatus.OFFLINE, oldSector, null, null);
 
-        UpdateGatewayRequest request = new UpdateGatewayRequest(
+        UpdateGatewayInput request = new UpdateGatewayInput(
                 gatewayId,
                 "192.168.1.200",
                 "v2.0.0",
@@ -77,7 +77,7 @@ class UpdateGatewayUseCaseTest {
     void shouldThrowExceptionWhenGatewayNotFound() {
         // ARRANGE
         UUID nonExistentId = UUID.randomUUID();
-        UpdateGatewayRequest request = new UpdateGatewayRequest(nonExistentId, "192.168.1.2", "v1.1", GatewayStatus.ONLINE, null, null);
+        UpdateGatewayInput request = new UpdateGatewayInput(nonExistentId, "192.168.1.2", "v1.1", GatewayStatus.ONLINE, null, null);
 
         when(gatewayRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
@@ -100,7 +100,7 @@ class UpdateGatewayUseCaseTest {
         UUID invalidSectorId = UUID.randomUUID();
         Gateway existingGateway = new Gateway(gatewayId, "GW-01", "AA:BB:CC:DD:EE:FF", "192.168.1.1", "v1.0.0", GatewayStatus.OFFLINE, null, null, null);
 
-        UpdateGatewayRequest request = new UpdateGatewayRequest(gatewayId, null, null, null, invalidSectorId, null);
+        UpdateGatewayInput request = new UpdateGatewayInput(gatewayId, null, null, null, invalidSectorId, null);
 
         when(gatewayRepository.findById(gatewayId)).thenReturn(Optional.of(existingGateway));
         when(sectorRepository.findById(invalidSectorId)).thenReturn(Optional.empty());

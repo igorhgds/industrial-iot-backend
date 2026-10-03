@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.gateway;
 
-import henrique.igor.iiot.application.usecases.gateway.dto.RegisterGatewayRequest;
+import henrique.igor.iiot.application.usecases.gateway.dto.RegisterGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
@@ -21,14 +21,14 @@ public class RegisterGatewayUseCase {
         this.gatewayCodeGenerator = gatewayCodeGenerator;
     }
 
-    public Gateway execute(RegisterGatewayRequest request) {
+    public Gateway execute(RegisterGatewayInput input) {
         Sector sector = null;
-        if (request.sectorId() != null) {
-            sector = sectorRepository.findById(request.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + request.sectorId()));
+        if (input.sectorId() != null) {
+            sector = sectorRepository.findById(input.sectorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
         }
 
-        String gatewayCode = request.code();
+        String gatewayCode = input.code();
         if (gatewayCode == null || gatewayCode.isBlank()) {
             gatewayCode = gatewayCodeGenerator.generate(sector);
         } else {
@@ -39,10 +39,10 @@ public class RegisterGatewayUseCase {
 
         Gateway newGateway = new Gateway(
                 gatewayCode,
-                request.macAddress(),
-                request.ipAddress(),
-                request.firmwareVersion(),
-                request.status(),
+                input.macAddress(),
+                input.ipAddress(),
+                input.firmwareVersion(),
+                input.status(),
                 sector,
                 null
         );

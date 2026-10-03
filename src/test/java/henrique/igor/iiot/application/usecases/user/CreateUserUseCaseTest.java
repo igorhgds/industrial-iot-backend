@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.user;
 
-import henrique.igor.iiot.application.usecases.user.dto.CreateUserRequest;
+import henrique.igor.iiot.application.usecases.user.dto.CreateUserInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.enums.UserRole;
@@ -38,7 +38,7 @@ class CreateUserUseCaseTest {
         // Arrange
         UUID sectorId = UUID.randomUUID();
         Sector sector = new Sector(sectorId, "Stamping Line", "Main stamping sector", null);
-        CreateUserRequest request = new CreateUserRequest(
+        CreateUserInput request = new CreateUserInput(
                 "Igor Henrique",
                 "igor@example.com",
                 "securePass123",
@@ -71,7 +71,7 @@ class CreateUserUseCaseTest {
     @DisplayName("Should create user successfully when sectorId is null")
     void shouldCreateUserSuccessfullyWithoutSector() {
         // Arrange
-        CreateUserRequest request = new CreateUserRequest(
+        CreateUserInput request = new CreateUserInput(
                 "John Doe",
                 "john@example.com",
                 "pass123",
@@ -100,7 +100,7 @@ class CreateUserUseCaseTest {
     @DisplayName("Should throw IllegalArgumentException when email already exists")
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // Arrange
-        CreateUserRequest request = new CreateUserRequest(
+        CreateUserInput request = new CreateUserInput(
                 "Duplicate User",
                 "existing@example.com",
                 "pass123",
@@ -128,7 +128,7 @@ class CreateUserUseCaseTest {
     void shouldThrowExceptionWhenSectorNotFound() {
         // Arrange
         UUID nonExistentSectorId = UUID.randomUUID();
-        CreateUserRequest request = new CreateUserRequest(
+        CreateUserInput request = new CreateUserInput(
                 "Test User",
                 "test@example.com",
                 "pass123",

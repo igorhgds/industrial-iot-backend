@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.equipment;
 
-import henrique.igor.iiot.application.usecases.equipment.dto.RegisterEquipmentRequest;
+import henrique.igor.iiot.application.usecases.equipment.dto.RegisterEquipmentInput;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
@@ -27,37 +27,37 @@ public class RegisterEquipmentUseCase {
         this.equipmentCodeGenerator = equipmentCodeGenerator;
     }
 
-    public Equipment execute(RegisterEquipmentRequest request) {
-        if (request.type() == null) {
+    public Equipment execute(RegisterEquipmentInput input) {
+        if (input.type() == null) {
             throw new IllegalArgumentException("Equipment type cannot be null.");
         }
 
         Sector sector = null;
-        if (request.sectorId() != null) {
-            sector = sectorRepository.findById(request.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + request.sectorId()));
+        if (input.sectorId() != null) {
+            sector = sectorRepository.findById(input.sectorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
         }
 
         Gateway gateway = null;
-        if (request.gatewayId() != null) {
-            gateway = gatewayRepository.findById(request.gatewayId())
-                    .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + request.gatewayId()));
+        if (input.gatewayId() != null) {
+            gateway = gatewayRepository.findById(input.gatewayId())
+                    .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + input.gatewayId()));
         }
 
-        String equipCode = request.equipCode();
+        String equipCode = input.equipCode();
         if (equipCode == null || equipCode.isBlank()) {
-            equipCode = equipmentCodeGenerator.generate(request.type(), sector);
+            equipCode = equipmentCodeGenerator.generate(input.type(), sector);
         } else {
             if (equipmentRepository.findByEquipCode(equipCode).isPresent()) {
                 throw new IllegalArgumentException("Equipment with code " + equipCode + " already exists.");
             }
         }
 
-        EquipStatus status = request.status() != null ? request.status() : EquipStatus.ACTIVE;
+        EquipStatus status = input.status() != null ? input.status() : EquipStatus.ACTIVE;
 
         Equipment newEquipment = new Equipment(
                 equipCode,
-                request.type(),
+                input.type(),
                 sector,
                 gateway
         );

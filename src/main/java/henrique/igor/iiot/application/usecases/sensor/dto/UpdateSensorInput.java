@@ -4,7 +4,7 @@ import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 
 import java.util.UUID;
 
-public record UpdateSensorRequest(
+public record UpdateSensorInput(
         UUID sensorId,
         SensorStatus status,
         String mqttTopic,

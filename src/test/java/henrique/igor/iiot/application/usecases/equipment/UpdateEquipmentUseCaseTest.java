@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.equipment;
 
-import henrique.igor.iiot.application.usecases.equipment.dto.UpdateEquipmentRequest;
+import henrique.igor.iiot.application.usecases.equipment.dto.UpdateEquipmentInput;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
@@ -51,7 +51,7 @@ class UpdateEquipmentUseCaseTest {
         Gateway newGateway = new Gateway(newGatewayId, "GW-02", "MAC-2", "192.168.1.2", "v1", GatewayStatus.ONLINE, newSector, null, null);
         Equipment existingEquipment = new Equipment(equipmentId, "MTR-01", EquipType.MOTOR, EquipStatus.ACTIVE, null, null, null);
 
-        UpdateEquipmentRequest request = new UpdateEquipmentRequest(
+        UpdateEquipmentInput request = new UpdateEquipmentInput(
                 equipmentId,
                 EquipStatus.MAINTENANCE,
                 newSectorId,
@@ -85,7 +85,7 @@ class UpdateEquipmentUseCaseTest {
     void shouldThrowExceptionWhenEquipmentNotFound() {
         // 1. ARRANGE
         UUID nonExistentId = UUID.randomUUID();
-        UpdateEquipmentRequest request = new UpdateEquipmentRequest(nonExistentId, EquipStatus.ACTIVE, null, null);
+        UpdateEquipmentInput request = new UpdateEquipmentInput(nonExistentId, EquipStatus.ACTIVE, null, null);
 
         when(equipmentRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 

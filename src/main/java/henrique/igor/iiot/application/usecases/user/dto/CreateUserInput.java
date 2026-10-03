@@ -4,7 +4,7 @@ import henrique.igor.iiot.domain.entities.enums.UserRole;
 
 import java.util.UUID;
 
-public record CreateUserRequest(
+public record CreateUserInput(
         String name,
         String email,
         String password,
