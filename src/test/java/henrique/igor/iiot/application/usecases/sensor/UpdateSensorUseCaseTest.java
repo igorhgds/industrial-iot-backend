@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.sensor;
 
-import henrique.igor.iiot.application.usecases.sensor.dto.UpdateSensorRequest;
+import henrique.igor.iiot.application.usecases.sensor.dto.UpdateSensorInput;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
@@ -10,9 +10,12 @@ import henrique.igor.iiot.domain.entities.enums.SensorType;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
 import henrique.igor.iiot.domain.services.SensorCodeGenerator;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
@@ -22,20 +25,20 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class UpdateSensorUseCaseTest {
 
+    @Mock
     private SensorRepository sensorRepository;
-    private EquipmentRepository equipmentRepository;
-    private SensorCodeGenerator sensorCodeGenerator;
-    private UpdateSensorUseCase updateSensorUseCase;
 
-    @BeforeEach
-    void setUp() {
-        sensorRepository = mock(SensorRepository.class);
-        equipmentRepository = mock(EquipmentRepository.class);
-        sensorCodeGenerator = new SensorCodeGenerator(sensorRepository);
-        updateSensorUseCase = new UpdateSensorUseCase(sensorRepository, equipmentRepository, sensorCodeGenerator);
-    }
+    @Mock
+    private EquipmentRepository equipmentRepository;
+
+    @Mock
+    private SensorCodeGenerator sensorCodeGenerator;
+
+    @InjectMocks
+    private UpdateSensorUseCase updateSensorUseCase;
 
     @Test
     @DisplayName("Should update sensor status and MQTT topic successfully")
@@ -43,7 +46,7 @@ class UpdateSensorUseCaseTest {
         UUID sensorId = UUID.randomUUID();
         Sensor existingSensor = new Sensor(sensorId, "TEM-001-MTR-USI-001", SensorType.TEMPERATURE, SensorStatus.ONLINE, "°C", "old/topic", null, OffsetDateTime.now());
 
-        UpdateSensorRequest request = new UpdateSensorRequest(
+        UpdateSensorInput request = new UpdateSensorInput(
                 sensorId,
                 SensorStatus.OFFLINE,
                 "new/topic",
@@ -75,7 +78,7 @@ class UpdateSensorUseCaseTest {
 
         Sensor existingSensor = new Sensor(sensorId, "TEM-001-MTR-USI-001", SensorType.TEMPERATURE, SensorStatus.ONLINE, "°C", "telemetry/tem", oldEquipment, OffsetDateTime.now());
 
-        UpdateSensorRequest request = new UpdateSensorRequest(
+        UpdateSensorInput request = new UpdateSensorInput(
                 sensorId,
                 null,
                 null,
@@ -84,7 +87,7 @@ class UpdateSensorUseCaseTest {
 
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(existingSensor));
         when(equipmentRepository.findById(newEquipId)).thenReturn(Optional.of(newEquipment));
-        when(sensorRepository.countByEquipmentIdAndSensorType(newEquipId, SensorType.TEMPERATURE)).thenReturn(0L);
+        when(sensorCodeGenerator.generate(SensorType.TEMPERATURE, newEquipment)).thenReturn("TEM-001-CMP-USI-002");
         when(sensorRepository.save(any(Sensor.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Sensor updatedSensor = updateSensorUseCase.execute(request);
@@ -93,6 +96,7 @@ class UpdateSensorUseCaseTest {
         assertEquals(newEquipment, updatedSensor.getEquipment());
         assertEquals("TEM-001-CMP-USI-002", updatedSensor.getCode());
 
+        verify(sensorCodeGenerator, times(1)).generate(SensorType.TEMPERATURE, newEquipment);
         verify(sensorRepository, times(1)).save(existingSensor);
     }
 
@@ -100,7 +104,7 @@ class UpdateSensorUseCaseTest {
     @DisplayName("Should throw exception when sensor not found")
     void shouldThrowExceptionWhenSensorNotFound() {
         UUID sensorId = UUID.randomUUID();
-        UpdateSensorRequest request = new UpdateSensorRequest(sensorId, SensorStatus.ONLINE, null, null);
+        UpdateSensorInput request = new UpdateSensorInput(sensorId, SensorStatus.ONLINE, null, null);
 
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.empty());
 
@@ -117,7 +121,7 @@ class UpdateSensorUseCaseTest {
         UUID newEquipId = UUID.randomUUID();
 
         Sensor existingSensor = new Sensor(sensorId, "TEM-001-GEN", SensorType.TEMPERATURE, SensorStatus.ONLINE, "°C", "topic", null, OffsetDateTime.now());
-        UpdateSensorRequest request = new UpdateSensorRequest(sensorId, null, null, newEquipId);
+        UpdateSensorInput request = new UpdateSensorInput(sensorId, null, null, newEquipId);
 
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(existingSensor));
         when(equipmentRepository.findById(newEquipId)).thenReturn(Optional.empty());

@@ -5,10 +5,9 @@ import henrique.igor.iiot.domain.entities.enums.EquipType;
 
 import java.util.UUID;
 
-public record RegisterEquipmentRequest(
+public record RegisterEquipmentInput(
         String equipCode,
         EquipType type,
-        EquipStatus status,
         UUID sectorId,
         UUID gatewayId
 ) {

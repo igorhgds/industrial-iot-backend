@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.equipment;
 
-import henrique.igor.iiot.application.usecases.equipment.dto.UpdateEquipmentRequest;
+import henrique.igor.iiot.application.usecases.equipment.dto.UpdateEquipmentInput;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
@@ -20,23 +20,23 @@ public class UpdateEquipmentUseCase {
         this.gatewayRepository = gatewayRepository;
     }
 
-    public Equipment execute(UpdateEquipmentRequest request) {
-        Equipment equipment = equipmentRepository.findById(request.equipmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + request.equipmentId()));
+    public Equipment execute(UpdateEquipmentInput input) {
+        Equipment equipment = equipmentRepository.findById(input.equipmentId())
+                .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + input.equipmentId()));
 
-        if (request.status() != null) {
-            equipment.changeStatus(request.status());
+        if (input.status() != null) {
+            equipment.changeStatus(input.status());
         }
 
-        if (request.sectorId() != null) {
-            Sector newSector = sectorRepository.findById(request.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + request.sectorId()));
+        if (input.sectorId() != null) {
+            Sector newSector = sectorRepository.findById(input.sectorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
             equipment.relocateToSector(newSector);
         }
 
-        if (request.gatewayId() != null) {
-            Gateway newGateway = gatewayRepository.findById(request.gatewayId())
-                    .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + request.gatewayId()));
+        if (input.gatewayId() != null) {
+            Gateway newGateway = gatewayRepository.findById(input.gatewayId())
+                    .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + input.gatewayId()));
             equipment.connectToGateway(newGateway);
         }
 

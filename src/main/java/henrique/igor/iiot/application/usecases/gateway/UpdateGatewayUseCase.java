@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.gateway;
 
-import henrique.igor.iiot.application.usecases.gateway.dto.UpdateGatewayRequest;
+import henrique.igor.iiot.application.usecases.gateway.dto.UpdateGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
@@ -16,25 +16,25 @@ public class UpdateGatewayUseCase {
         this.sectorRepository = sectorRepository;
     }
 
-    public Gateway execute(UpdateGatewayRequest request){
-        Gateway gateway = gatewayRepository.findById(request.gatewayId())
-                .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + request.gatewayId()));
+    public Gateway execute(UpdateGatewayInput input){
+        Gateway gateway = gatewayRepository.findById(input.gatewayId())
+                .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + input.gatewayId()));
 
-        if (request.ipAddress() != null) {
-            gateway.updateIpAddress(request.ipAddress());
+        if (input.ipAddress() != null) {
+            gateway.updateIpAddress(input.ipAddress());
         }
 
-        if (request.firmwareVersion() != null) {
-            gateway.updateFirmware(request.firmwareVersion());
+        if (input.firmwareVersion() != null) {
+            gateway.updateFirmware(input.firmwareVersion());
         }
 
-        if (request.status() != null) {
-            gateway.changeStatus(request.status());
+        if (input.status() != null) {
+            gateway.changeStatus(input.status());
         }
 
-        if (request.sectorId() != null) {
-            Sector newSector = sectorRepository.findById(request.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + request.sectorId()));
+        if (input.sectorId() != null) {
+            Sector newSector = sectorRepository.findById(input.sectorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
             gateway.relocateToSector(newSector);
         }
 

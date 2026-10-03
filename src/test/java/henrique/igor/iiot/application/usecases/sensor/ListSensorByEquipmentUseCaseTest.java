@@ -8,9 +8,12 @@ import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorType;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.OffsetDateTime;
 import java.util.Collections;
@@ -21,18 +24,17 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class ListSensorByEquipmentUseCaseTest {
 
+    @Mock
     private SensorRepository sensorRepository;
-    private EquipmentRepository equipmentRepository;
-    private ListSensorByEquipmentUseCase listSensorByEquipmentUseCase;
 
-    @BeforeEach
-    void setUp() {
-        sensorRepository = mock(SensorRepository.class);
-        equipmentRepository = mock(EquipmentRepository.class);
-        listSensorByEquipmentUseCase = new ListSensorByEquipmentUseCase(sensorRepository, equipmentRepository);
-    }
+    @Mock
+    private EquipmentRepository equipmentRepository;
+
+    @InjectMocks
+    private ListSensorByEquipmentUseCase listSensorByEquipmentUseCase;
 
     @Test
     @DisplayName("Should list sensors by equipment ID successfully")
