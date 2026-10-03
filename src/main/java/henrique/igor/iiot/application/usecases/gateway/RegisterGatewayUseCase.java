@@ -42,7 +42,6 @@ public class RegisterGatewayUseCase {
                 input.macAddress(),
                 input.ipAddress(),
                 input.firmwareVersion(),
-                input.status(),
                 sector,
                 null
         );

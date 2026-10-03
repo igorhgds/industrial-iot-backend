@@ -1,13 +1,8 @@
 package henrique.igor.iiot.application.usecases.equipment;
 
 import henrique.igor.iiot.application.usecases.equipment.dto.RegisterEquipmentInput;
-import henrique.igor.iiot.domain.entities.Equipment;
-import henrique.igor.iiot.domain.entities.Gateway;
-import henrique.igor.iiot.domain.entities.Sector;
-import henrique.igor.iiot.domain.entities.enums.EquipStatus;
-import henrique.igor.iiot.domain.repositories.EquipmentRepository;
-import henrique.igor.iiot.domain.repositories.GatewayRepository;
-import henrique.igor.iiot.domain.repositories.SectorRepository;
+import henrique.igor.iiot.domain.entities.*;
+import henrique.igor.iiot.domain.repositories.*;
 import henrique.igor.iiot.domain.services.EquipmentCodeGenerator;
 
 public class RegisterEquipmentUseCase {
@@ -53,7 +48,6 @@ public class RegisterEquipmentUseCase {
             }
         }
 
-        EquipStatus status = input.status() != null ? input.status() : EquipStatus.ACTIVE;
 
         Equipment newEquipment = new Equipment(
                 equipCode,
@@ -61,7 +55,6 @@ public class RegisterEquipmentUseCase {
                 sector,
                 gateway
         );
-        newEquipment.changeStatus(status);
 
         return equipmentRepository.save(newEquipment);
     }

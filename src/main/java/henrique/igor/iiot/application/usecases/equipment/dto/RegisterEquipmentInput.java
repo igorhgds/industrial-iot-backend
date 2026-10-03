@@ -8,7 +8,6 @@ import java.util.UUID;
 public record RegisterEquipmentInput(
         String equipCode,
         EquipType type,
-        EquipStatus status,
         UUID sectorId,
         UUID gatewayId
 ) {

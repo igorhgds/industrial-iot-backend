@@ -48,7 +48,6 @@ class RegisterGatewayUseCaseTest {
                 "AA:BB:CC:DD:EE:01",
                 "192.168.1.100",
                 "v1.0.0",
-                GatewayStatus.ONLINE,
                 sectorId
         );
 
@@ -83,7 +82,6 @@ class RegisterGatewayUseCaseTest {
                 "AA:BB:CC:DD:EE:02",
                 "192.168.1.101",
                 "v1.0.0",
-                GatewayStatus.OFFLINE,
                 null
         );
 
@@ -112,10 +110,9 @@ class RegisterGatewayUseCaseTest {
                 "AA:BB:CC:DD:EE:03",
                 "192.168.1.102",
                 "v1.0.0",
-                GatewayStatus.ONLINE,
                 null
         );
-        Gateway existingGateway = new Gateway("GW-DUPLICATE", "AA:BB:CC:DD:EE:03", "192.168.1.102", "v1.0.0", GatewayStatus.ONLINE, null, null);
+        Gateway existingGateway = new Gateway("GW-DUPLICATE", "AA:BB:CC:DD:EE:03", "192.168.1.102", "v1.0.0", null, null);
 
         when(gatewayRepository.findByCode(request.code())).thenReturn(Optional.of(existingGateway));
 
@@ -140,7 +137,6 @@ class RegisterGatewayUseCaseTest {
                 "AA:BB:CC:DD:EE:04",
                 "192.168.1.103",
                 "v1.0.0",
-                GatewayStatus.OFFLINE,
                 nonExistentSectorId
         );
 
@@ -169,7 +165,6 @@ class RegisterGatewayUseCaseTest {
                 "AA:BB:CC:DD:EE:05",
                 "192.168.1.105",
                 "v1.0.0",
-                GatewayStatus.ONLINE,
                 sectorId
         );
 
