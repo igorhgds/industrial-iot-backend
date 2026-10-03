@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.sector;
 
-import henrique.igor.iiot.application.usecases.sector.dto.CreateSectorRequest;
+import henrique.igor.iiot.application.usecases.sector.dto.CreateSectorInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +29,7 @@ class CreateSectorUseCaseTest {
     @DisplayName("Should create sector successfully")
     void shouldCreateSectorSuccessfully(){
         // Arrange
-        CreateSectorRequest request = new CreateSectorRequest(
+        CreateSectorInput request = new CreateSectorInput(
                 "machining line",
                 "A machining line is a sequential arrangement of machine tools—such as CNC mills, lathes, and drills"
         );
@@ -54,7 +54,7 @@ class CreateSectorUseCaseTest {
     @DisplayName("Should throw IllegalArgumentException when name already exists")
     void shouldThrowExceptionWhenNameAlreadyExists(){
         // Arrange
-        CreateSectorRequest request = new CreateSectorRequest(
+        CreateSectorInput request = new CreateSectorInput(
                 "machining line",
                 "A machining line is a sequential arrangement of machine tools—such as CNC mills, lathes, and drills"
         );

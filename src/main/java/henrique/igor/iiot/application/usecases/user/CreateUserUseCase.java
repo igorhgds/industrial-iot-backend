@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.user;
 
-import henrique.igor.iiot.application.usecases.user.dto.CreateUserRequest;
+import henrique.igor.iiot.application.usecases.user.dto.CreateUserInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
@@ -16,23 +16,23 @@ public class CreateUserUseCase {
         this.sectorRepository = sectorRepository;
     }
 
-    public User execute(CreateUserRequest request){
-        if (userRepository.findByEmail(request.email()).isPresent()) {
-            throw new IllegalArgumentException("User with email " + request.email() + "already exists.");
+    public User execute(CreateUserInput input){
+        if (userRepository.findByEmail(input.email()).isPresent()) {
+            throw new IllegalArgumentException("User with email " + input.email() + "already exists.");
         }
 
         Sector sector = null;
-        if (request.sectorId() != null) {
-            sector = sectorRepository.findById(request.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + request.sectorId()));
+        if (input.sectorId() != null) {
+            sector = sectorRepository.findById(input.sectorId())
+                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
         }
 
         User newUser = new User(
-                request.name(),
-                request.email(),
-                request.password(),
-                request.passwordRecovery(),
-                request.userRole(),
+                input.name(),
+                input.email(),
+                input.password(),
+                input.passwordRecovery(),
+                input.userRole(),
                 sector
         );
 

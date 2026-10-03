@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.user;
 
-import henrique.igor.iiot.application.usecases.user.dto.UpdateUserRequest;
+import henrique.igor.iiot.application.usecases.user.dto.UpdateUserInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.enums.UserRole;
@@ -41,7 +41,7 @@ class UpdateUserUseCaseTest {
         Sector sector = new Sector(sectorId, "Assembly Line", "Description", null);
         User existingUser = new User(userId, "Old Name", "user@example.com", "pass", "hint", UserRole.OPERATOR, null, null);
 
-        UpdateUserRequest request = new UpdateUserRequest(
+        UpdateUserInput request = new UpdateUserInput(
                 userId,
                 "New Name",
                 "user@example.com",
@@ -76,7 +76,7 @@ class UpdateUserUseCaseTest {
         UUID userId = UUID.randomUUID();
         User existingUser = new User(userId, "User", "old@example.com", "pass", "hint", UserRole.OPERATOR, null, null);
 
-        UpdateUserRequest request = new UpdateUserRequest(
+        UpdateUserInput request = new UpdateUserInput(
                 userId,
                 "Updated User",
                 "new@example.com",
@@ -108,7 +108,7 @@ class UpdateUserUseCaseTest {
     void shouldThrowExceptionWhenUserNotFound() {
         // ARRANGE
         UUID nonExistentUserId = UUID.randomUUID();
-        UpdateUserRequest request = new UpdateUserRequest(nonExistentUserId, "Name", "email@example.com", UserRole.OPERATOR, null);
+        UpdateUserInput request = new UpdateUserInput(nonExistentUserId, "Name", "email@example.com", UserRole.OPERATOR, null);
 
         when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
 
@@ -131,7 +131,7 @@ class UpdateUserUseCaseTest {
         User existingUser = new User(userId, "User 1", "user1@example.com", "pass", "hint", UserRole.OPERATOR, null, null);
         User anotherUser = new User(UUID.randomUUID(), "User 2", "user2@example.com", "pass", "hint", UserRole.OPERATOR, null, null);
 
-        UpdateUserRequest request = new UpdateUserRequest(
+        UpdateUserInput request = new UpdateUserInput(
                 userId,
                 "User 1 Updated",
                 "user2@example.com",

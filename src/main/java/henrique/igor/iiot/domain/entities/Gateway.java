@@ -17,8 +17,8 @@ public class Gateway {
     private OffsetDateTime lastPing;
     private final OffsetDateTime createdAt;
 
-    public Gateway(String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing){
-        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, status != null ? status : GatewayStatus.OFFLINE, sector, lastPing, OffsetDateTime.now());
+    public Gateway(String code, String macAddress, String ipAddress, String firmwareVersion, Sector sector, OffsetDateTime lastPing){
+        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, GatewayStatus.OFFLINE, sector, lastPing, OffsetDateTime.now());
     }
 
     public Gateway(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing, OffsetDateTime createdAt) {

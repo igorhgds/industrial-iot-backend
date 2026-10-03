@@ -1,6 +1,7 @@
 package henrique.igor.iiot.infrastructure.persistence.adapters;
 
 import henrique.igor.iiot.domain.entities.Actuator;
+import henrique.igor.iiot.domain.entities.enums.ActuatorType;
 import henrique.igor.iiot.domain.repositories.ActuatorRepository;
 import henrique.igor.iiot.infrastructure.persistence.entities.ActuatorJpaEntity;
 import henrique.igor.iiot.infrastructure.persistence.mappers.ActuatorMapper;
@@ -48,5 +49,15 @@ public class ActuatorPersistenceAdapter implements ActuatorRepository {
     @Override
     public void deleteById(UUID actuatorId) {
         actuatorJpaRepository.deleteById(actuatorId);
+    }
+
+    @Override
+    public long countByEquipmentIdAndActuatorType(UUID equipmentId, ActuatorType actuatorType) {
+        return actuatorJpaRepository.countByEquipment_EquipmentIdAndActuatorType(equipmentId, actuatorType);
+    }
+
+    @Override
+    public long countByCountEquipementIdIsNullAndActuatorType(ActuatorType actuatorType) {
+        return actuatorJpaRepository.countByEquipmentIsNullAndActuatorType(actuatorType);
     }
 }

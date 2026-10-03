@@ -1,6 +1,6 @@
 package henrique.igor.iiot.application.usecases.sector.dto;
 
-public record CreateSectorRequest(
+public record CreateSectorInput(
         String name,
         String description
 ) {
