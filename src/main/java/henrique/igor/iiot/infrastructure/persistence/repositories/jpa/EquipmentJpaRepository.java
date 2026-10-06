@@ -8,9 +8,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 @Repository
 public interface EquipmentJpaRepository extends JpaRepository<EquipmentJpaEntity, UUID> {
 
+    @EntityGraph(attributePaths = {"sector", "gateway"})
     Optional<EquipmentJpaEntity> findByEquipCode(String equipCode);
 
     long countBySectorSectorIdAndType(UUID sectorId, EquipType type);

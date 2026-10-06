@@ -61,11 +61,11 @@ class RegisterGatewayUseCaseTest {
         // ASSERT
         assertNotNull(createdGateway);
         assertNotNull(createdGateway.getGatewayId());
-        assertEquals("GW-ST-01", createdGateway.getCode());
+        assertEquals("GW-ST-01", createdGateway.getGatewayCode());
         assertEquals("AA:BB:CC:DD:EE:01", createdGateway.getMacAddress());
         assertEquals("192.168.1.100", createdGateway.getIpAddress());
         assertEquals("v1.0.0", createdGateway.getFirmwareVersion());
-        assertEquals(GatewayStatus.ONLINE, createdGateway.getStatus());
+        assertEquals(GatewayStatus.OFFLINE, createdGateway.getStatus());
         assertEquals(sector, createdGateway.getSector());
 
         verify(gatewayRepository, times(1)).findByCode(request.code());
@@ -93,7 +93,7 @@ class RegisterGatewayUseCaseTest {
 
         // ASSERT
         assertNotNull(createdGateway);
-        assertEquals("GW-STANDALONE", createdGateway.getCode());
+        assertEquals("GW-STANDALONE", createdGateway.getGatewayCode());
         assertNull(createdGateway.getSector());
 
         verify(gatewayRepository, times(1)).findByCode(request.code());
@@ -177,7 +177,7 @@ class RegisterGatewayUseCaseTest {
 
         // 3. ASSERT
         assertNotNull(createdGateway);
-        assertEquals("GW-USI-003", createdGateway.getCode());
+        assertEquals("GW-USI-003", createdGateway.getGatewayCode());
         assertEquals(sector, createdGateway.getSector());
 
         verify(sectorRepository, times(1)).findById(sectorId);

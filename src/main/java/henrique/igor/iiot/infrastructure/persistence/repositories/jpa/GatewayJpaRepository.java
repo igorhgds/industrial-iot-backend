@@ -7,9 +7,12 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 @Repository
 public interface GatewayJpaRepository extends JpaRepository<GatewayJpaEntity, UUID> {
 
+    @EntityGraph(attributePaths = {"sector"})
     Optional<GatewayJpaEntity> findByCode(String code);
 
     java.util.List<GatewayJpaEntity> findBySectorSectorId(UUID sectorId);
