@@ -12,7 +12,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -50,8 +49,8 @@ class ListGatewaysBySectorUseCaseTest {
         // ASSERT
         assertNotNull(actualGateways);
         assertEquals(2, actualGateways.size());
-        assertEquals("GW-01", actualGateways.get(0).getCode());
-        assertEquals("GW-02", actualGateways.get(1).getCode());
+        assertEquals("GW-01", actualGateways.get(0).getGatewayCode());
+        assertEquals("GW-02", actualGateways.get(1).getGatewayCode());
 
         verify(sectorRepository, times(1)).findById(sectorId);
         verify(gatewayRepository, times(1)).findBySectorId(sectorId);

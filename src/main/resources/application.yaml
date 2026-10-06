@@ -13,6 +13,15 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+
+mqtt:
+  broker:
+    url: tcp://${MQTT_BROKER_HOST:localhost}:${MQTT_BROKER_PORT:1883}
+  client:
+    id: ${MQTT_CLIENT_ID:industrial-backend-consumer}
+  topic:
+    telemetry: ${MQTT_TELEMETRY_TOPIC:industry/machinery/+}
+
 springdoc:
   api-docs:
     enabled: false

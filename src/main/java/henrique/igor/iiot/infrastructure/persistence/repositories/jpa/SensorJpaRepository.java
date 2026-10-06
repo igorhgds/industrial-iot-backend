@@ -7,9 +7,12 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+import org.springframework.data.jpa.repository.EntityGraph;
+
 @Repository
 public interface SensorJpaRepository extends JpaRepository<SensorJpaEntity, UUID> {
 
+    @EntityGraph(attributePaths = {"equipment"})
     Optional<SensorJpaEntity> findByCode(String code);
 
     long countByEquipment_EquipmentIdAndSensorType(UUID equipmentId, SensorType sensorType);

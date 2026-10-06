@@ -4,6 +4,8 @@ import henrique.igor.iiot.domain.entities.enums.HealthStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.ColumnTransformer;
+import org.hibernate.annotations.JdbcTypeCode;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -26,10 +28,12 @@ public class EquipmentStateJpaEntity {
     @Column(nullable = false)
     private HealthStatus status;
 
-    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
+    @ColumnTransformer(write = "?::jsonb")
+    @Column(name = "last_payload", columnDefinition = "jsonb")
     private String lastPayload;
 
-    @Column(nullable = false, updatable = false)
+    @Column(nullable = false)
     private OffsetDateTime updatedAt;
 
     public EquipmentStateJpaEntity(){}
