@@ -22,7 +22,19 @@ public class EquipmentStatePersistenceAdapter implements EquipmentStateRepositor
 
     @Override
     public EquipmentState save(EquipmentState equipmentState) {
-        EquipmentStateJpaEntity jpaEntity = EquipmentStateMapper.toJpaEntity(equipmentState);
+        if (equipmentState == null || equipmentState.getEquipmentId() == null) {
+            return null;
+        }
+        UUID id = equipmentState.getEquipmentId().getEquipmentId();
+        EquipmentStateJpaEntity jpaEntity = equipmentStateJpaRepository.findById(id)
+                .map(existing -> {
+                    existing.setStatus(equipmentState.getStatus());
+                    existing.setLastPayload(equipmentState.getLastPayload());
+                    existing.setUpdatedAt(equipmentState.getUpdatedAt());
+                    return existing;
+                })
+                .orElseGet(() -> EquipmentStateMapper.toJpaEntity(equipmentState));
+
         EquipmentStateJpaEntity savedEntity = equipmentStateJpaRepository.save(jpaEntity);
         return EquipmentStateMapper.toDomain(savedEntity);
     }

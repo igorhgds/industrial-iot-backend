@@ -4,5 +4,6 @@ public enum HealthStatus {
     OPERATIONAL,
     WARNING,
     CRITICAL,
+    HEALTH,
     UNKNOWN
 }

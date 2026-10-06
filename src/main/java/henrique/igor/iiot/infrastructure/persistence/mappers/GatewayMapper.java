@@ -9,7 +9,7 @@ public class GatewayMapper {
         if (domain == null) return null;
         return new GatewayJpaEntity(
                 domain.getGatewayId(),
-                domain.getCode(),
+                domain.getGatewayCode(),
                 domain.getMacAddress(),
                 domain.getIpAddress(),
                 domain.getFirmwareVersion(),

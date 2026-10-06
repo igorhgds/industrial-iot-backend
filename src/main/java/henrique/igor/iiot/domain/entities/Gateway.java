@@ -8,7 +8,7 @@ import java.util.UUID;
 public class Gateway {
 
     private final UUID gatewayId;
-    private final String code;
+    private final String gatewayCode;
     private final String macAddress;
     private String ipAddress;
     private String firmwareVersion;
@@ -17,13 +17,13 @@ public class Gateway {
     private OffsetDateTime lastPing;
     private final OffsetDateTime createdAt;
 
-    public Gateway(String code, String macAddress, String ipAddress, String firmwareVersion, Sector sector, OffsetDateTime lastPing){
-        this(UUID.randomUUID(), code, macAddress, ipAddress, firmwareVersion, GatewayStatus.OFFLINE, sector, lastPing, OffsetDateTime.now());
+    public Gateway(String gatewayCode, String macAddress, String ipAddress, String firmwareVersion, Sector sector, OffsetDateTime lastPing){
+        this(UUID.randomUUID(), gatewayCode, macAddress, ipAddress, firmwareVersion, GatewayStatus.OFFLINE, sector, lastPing, OffsetDateTime.now());
     }
 
-    public Gateway(UUID gatewayId, String code, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing, OffsetDateTime createdAt) {
+    public Gateway(UUID gatewayId, String gatewayCode, String macAddress, String ipAddress, String firmwareVersion, GatewayStatus status, Sector sector, OffsetDateTime lastPing, OffsetDateTime createdAt) {
         this.gatewayId = gatewayId;
-        this.code = code;
+        this.gatewayCode = gatewayCode;
         this.macAddress = macAddress;
         this.ipAddress = ipAddress;
         this.firmwareVersion = firmwareVersion;
@@ -61,7 +61,7 @@ public class Gateway {
     }
 
     public UUID getGatewayId(){return gatewayId;}
-    public String getCode() {return code;}
+    public String getGatewayCode() {return gatewayCode;}
     public String getMacAddress() {return macAddress;}
     public String getIpAddress() {return ipAddress;}
     public String getFirmwareVersion() {return firmwareVersion;}

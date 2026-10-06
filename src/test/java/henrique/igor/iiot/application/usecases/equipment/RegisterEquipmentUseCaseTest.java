@@ -55,7 +55,6 @@ class RegisterEquipmentUseCaseTest {
         RegisterEquipmentInput request = new RegisterEquipmentInput(
                 "MTR-CUSTOM-01",
                 EquipType.MOTOR,
-                EquipStatus.ACTIVE,
                 sectorId,
                 gatewayId
         );
@@ -90,7 +89,6 @@ class RegisterEquipmentUseCaseTest {
         RegisterEquipmentInput request = new RegisterEquipmentInput(
                 null, // Trigger auto-generation
                 EquipType.MOTOR,
-                EquipStatus.ACTIVE,
                 sectorId,
                 null
         );
@@ -115,7 +113,7 @@ class RegisterEquipmentUseCaseTest {
     @DisplayName("Should throw IllegalArgumentException when equipment type is null")
     void shouldThrowExceptionWhenTypeIsNull() {
         // ARRANGE
-        RegisterEquipmentInput request = new RegisterEquipmentInput("MTR-01", null, EquipStatus.ACTIVE, null, null);
+        RegisterEquipmentInput request = new RegisterEquipmentInput("MTR-01", null, null, null);
 
         // ACT & ASSERT
         IllegalArgumentException exception = assertThrows(
@@ -131,7 +129,7 @@ class RegisterEquipmentUseCaseTest {
     @DisplayName("Should throw IllegalArgumentException when equipCode already exists")
     void shouldThrowExceptionWhenCodeAlreadyExists() {
         // ARRANGE
-        RegisterEquipmentInput request = new RegisterEquipmentInput("MTR-DUPLICATE", EquipType.MOTOR, EquipStatus.ACTIVE, null, null);
+        RegisterEquipmentInput request = new RegisterEquipmentInput("MTR-DUPLICATE", EquipType.MOTOR, null, null);
         Equipment existingEquipment = new Equipment("MTR-DUPLICATE", EquipType.MOTOR, null, null);
 
         when(equipmentRepository.findByEquipCode("MTR-DUPLICATE")).thenReturn(Optional.of(existingEquipment));
