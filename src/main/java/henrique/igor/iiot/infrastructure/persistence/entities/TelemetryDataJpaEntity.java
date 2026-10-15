@@ -25,16 +25,11 @@ public class TelemetryDataJpaEntity {
     @Column(name = "value")
     private BigDecimal value;
 
-    @JdbcTypeCode(SqlTypes.JSON)
-    @Column(name = "raw_payload", columnDefinition = "jsonb")
-    private String rawPayload;
-
     public TelemetryDataJpaEntity() {}
 
-    public TelemetryDataJpaEntity(TelemetryDataId id, SensorJpaEntity sensor, BigDecimal value, String rawPayload) {
+    public TelemetryDataJpaEntity(TelemetryDataId id, SensorJpaEntity sensor, BigDecimal value) {
         this.id = id;
         this.sensor = sensor;
         this.value = value;
-        this.rawPayload = rawPayload;
     }
 }

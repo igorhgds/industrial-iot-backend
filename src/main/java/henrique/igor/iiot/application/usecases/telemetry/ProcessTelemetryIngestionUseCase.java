@@ -8,9 +8,7 @@ import henrique.igor.iiot.infrastructure.messaging.dto.TelemetryPayloadDTO;
 
 import java.time.OffsetDateTime;
 import java.util.Optional;
-import org.springframework.stereotype.Service;
 
-@Service
 public class ProcessTelemetryIngestionUseCase {
 
     private final EquipmentRepository equipmentRepository;
@@ -47,15 +45,12 @@ public class ProcessTelemetryIngestionUseCase {
             TelemetryData telemetryData = new TelemetryData(
                     sensor,
                     timestamp,
-                    reading.value(),
-                    rawPayload
+                    reading.value()
             );
-
             telemetryDataRepository.save(telemetryData);
         }
 
         Optional<EquipmentState> existingState = equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId());
-
         HealthStatus status = existingState.isPresent()
                 ? existingState.get().getStatus()
                 : HealthStatus.HEALTH;
@@ -66,8 +61,6 @@ public class ProcessTelemetryIngestionUseCase {
                 rawPayload,
                 timestamp
         );
-
         equipmentStateRepository.save(equipmentState);
-
     }
 }

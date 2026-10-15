@@ -8,21 +8,18 @@ public class TelemetryData {
     private final Sensor sensor;
     private final OffsetDateTime timestamp;
     private final BigDecimal value;
-    private final String rawPayload;
 
-    public TelemetryData(Sensor sensor, BigDecimal value, String rawPayload) {
-        this(sensor, OffsetDateTime.now(), value, rawPayload);
+    public TelemetryData(Sensor sensor, BigDecimal value) {
+        this(sensor, OffsetDateTime.now(), value);
     }
 
-    public TelemetryData(Sensor sensor, OffsetDateTime timestamp, BigDecimal value, String rawPayload) {
+    public TelemetryData(Sensor sensor, OffsetDateTime timestamp, BigDecimal value) {
         this.sensor = sensor;
         this.timestamp = timestamp;
         this.value = value;
-        this.rawPayload = rawPayload;
     }
 
     public Sensor getSensor() { return sensor; }
     public OffsetDateTime getTimestamp() { return timestamp; }
     public BigDecimal getValue() { return value; }
-    public String getRawPayload() { return rawPayload; }
 }
