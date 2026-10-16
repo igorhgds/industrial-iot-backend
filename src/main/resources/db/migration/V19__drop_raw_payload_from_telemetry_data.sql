@@ -1,0 +1,1 @@
+ALTER TABLE telemetry_data DROP COLUMN raw_payload;
