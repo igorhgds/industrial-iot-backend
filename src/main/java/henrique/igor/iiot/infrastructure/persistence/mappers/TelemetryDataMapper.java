@@ -19,8 +19,7 @@ public class TelemetryDataMapper {
         return new TelemetryDataJpaEntity(
                 id,
                 sensorJpa,
-                domain.getValue(),
-                domain.getRawPayload()
+                domain.getValue()
         );
     }
 
@@ -33,8 +32,7 @@ public class TelemetryDataMapper {
         return new TelemetryData(
                 sensorDomain,
                 timestamp,
-                jpaEntity.getValue(),
-                jpaEntity.getRawPayload()
+                jpaEntity.getValue()
         );
     }
 }

@@ -106,28 +106,29 @@ We follow an iterative milestone roadmap. Documented below is our current develo
 The simulator models industrial 3-phase electric motors (e.g., 5CV, 380V operating under ISO 20816 vibration guidelines).
 
 ### MQTT Topic Format
-`industry/machinery/{equipmentCode}`
+`industry/machinery/{equipCode}`
 
 ### Sample Payload
 ```json
 {
-  "equipmentCode": "MTR-5CV-01",
-  "timestamp": "2026-08-24T15:30:00.123456",
+  "equipCode": "MTR-USI-001",
+  "gatewayCode": "GW-USI-001",
+  "timestamp": "2026-10-06T00:08:59.324289+00:00",
   "readings": [
     {
-      "sensorCode": "VOLTAGE",
+      "sensorCode": "VOL-001-MTR-USI-001",
       "value": 382.45
     },
     {
-      "sensorCode": "CURRENT",
+      "sensorCode": "CUR-001-MTR-USI-001",
       "value": 7.82
     },
     {
-      "sensorCode": "TEMPERATURE",
+      "sensorCode": "TEM-001-MTR-USI-001",
       "value": 68.30
     },
     {
-      "sensorCode": "VIBRATION",
+      "sensorCode": "VIB-001-MTR-USI-001",
       "value": 1.45
     }
   ]
