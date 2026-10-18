@@ -2,6 +2,7 @@ package henrique.igor.iiot.domain.entities;
 
 import henrique.igor.iiot.domain.entities.enums.ActuatorStatus;
 import henrique.igor.iiot.domain.entities.enums.ActuatorType;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -21,6 +22,9 @@ public class Actuator {
     }
 
     public Actuator(UUID actuatorId, String code, ActuatorType actuatorType, ActuatorStatus status, String commandMqttTopic, String stateMqttTopic, Equipment equipment, OffsetDateTime createdAt) {
+        if (actuatorType == null) {
+            throw new DomainValidationException("Actuator type cannot be null.");
+        }
         this.actuatorId = actuatorId;
         this.code = code;
         this.actuatorType = actuatorType;
