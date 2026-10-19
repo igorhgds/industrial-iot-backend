@@ -2,6 +2,8 @@ package henrique.igor.iiot.application.usecases.user;
 
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.enums.UserRole;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -57,14 +59,14 @@ class GetUserByIdUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when userId is null")
+    @DisplayName("Should throw DomainValidationException when userId is null")
     void shouldThrowExceptionWhenUserIdIsNull() {
         // ARRANGE
         UUID nullUserId = null;
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DomainValidationException exception = assertThrows(
+                DomainValidationException.class,
                 () -> getUserByIdUseCase.execute(nullUserId)
         );
 
@@ -74,7 +76,7 @@ class GetUserByIdUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when user is not found")
+    @DisplayName("Should throw ResourceNotFoundException when user is not found")
     void shouldThrowExceptionWhenUserNotFound() {
         // ARRANGE
         UUID nonExistentUserId = UUID.randomUUID();
@@ -82,12 +84,12 @@ class GetUserByIdUseCaseTest {
         when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> getUserByIdUseCase.execute(nonExistentUserId)
         );
 
-        assertEquals("User not found with ID: " + nonExistentUserId, exception.getMessage());
+        assertEquals("User not found with identifier: " + nonExistentUserId, exception.getMessage());
         verify(userRepository, times(1)).findById(nonExistentUserId);
     }
 }

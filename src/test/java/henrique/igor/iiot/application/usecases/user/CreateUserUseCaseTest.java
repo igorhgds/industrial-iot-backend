@@ -4,6 +4,8 @@ import henrique.igor.iiot.application.usecases.user.dto.CreateUserInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.enums.UserRole;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -97,7 +99,7 @@ class CreateUserUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when email already exists")
+    @DisplayName("Should throw ResourceAlreadyExistsException when email already exists")
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // Arrange
         CreateUserInput request = new CreateUserInput(
@@ -113,8 +115,8 @@ class CreateUserUseCaseTest {
         when(userRepository.findByEmail(request.email())).thenReturn(Optional.of(existingUser));
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = assertThrows(
+                ResourceAlreadyExistsException.class,
                 () -> createUserUseCase.execute(request)
         );
 
@@ -124,7 +126,7 @@ class CreateUserUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when sectorId does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when sectorId does not exist")
     void shouldThrowExceptionWhenSectorNotFound() {
         // Arrange
         UUID nonExistentSectorId = UUID.randomUUID();
@@ -141,12 +143,12 @@ class CreateUserUseCaseTest {
         when(sectorRepository.findById(nonExistentSectorId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> createUserUseCase.execute(request)
         );
 
-        assertTrue(exception.getMessage().contains("Sector not found with ID: " + nonExistentSectorId));
+        assertTrue(exception.getMessage().contains("Sector not found with identifier: " + nonExistentSectorId));
         verify(sectorRepository, times(1)).findById(nonExistentSectorId);
         verify(userRepository, never()).save(any());
     }

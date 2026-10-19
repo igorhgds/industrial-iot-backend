@@ -6,6 +6,7 @@ import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorType;
+import henrique.igor.iiot.domain.exceptions.*;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
 import henrique.igor.iiot.domain.services.SensorCodeGenerator;
@@ -121,7 +122,7 @@ class RegisterSensorUseCaseTest {
                 null
         );
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        DomainValidationException exception = assertThrows(DomainValidationException.class,
                 () -> registerSensorUseCase.execute(request));
 
         assertEquals("Sensor type cannot be null.", exception.getMessage());
@@ -141,10 +142,10 @@ class RegisterSensorUseCaseTest {
 
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> registerSensorUseCase.execute(request));
 
-        assertEquals("Equipment not found with ID: " + equipmentId, exception.getMessage());
+        assertEquals("Equipment not found with identifier: " + equipmentId, exception.getMessage());
     }
 
     @Test
@@ -161,9 +162,9 @@ class RegisterSensorUseCaseTest {
         Sensor existingSensor = new Sensor("EXISTING-CODE", SensorType.VOLTAGE, "V", "topic", null);
         when(sensorRepository.findByCode("EXISTING-CODE")).thenReturn(Optional.of(existingSensor));
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = assertThrows(ResourceAlreadyExistsException.class,
                 () -> registerSensorUseCase.execute(request));
 
-        assertEquals("Sensor with code EXISTING-CODE already exists.", exception.getMessage());
+        assertEquals("Sensor already exists with code: 'EXISTING-CODE'", exception.getMessage());
     }
 }
