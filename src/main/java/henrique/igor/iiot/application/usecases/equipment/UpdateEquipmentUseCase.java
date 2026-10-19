@@ -4,6 +4,7 @@ import henrique.igor.iiot.application.usecases.equipment.dto.UpdateEquipmentInpu
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
@@ -22,7 +23,7 @@ public class UpdateEquipmentUseCase {
 
     public Equipment execute(UpdateEquipmentInput input) {
         Equipment equipment = equipmentRepository.findById(input.equipmentId())
-                .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + input.equipmentId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Equipment", input.equipmentId()));
 
         if (input.status() != null) {
             equipment.changeStatus(input.status());
@@ -30,13 +31,13 @@ public class UpdateEquipmentUseCase {
 
         if (input.sectorId() != null) {
             Sector newSector = sectorRepository.findById(input.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Sector", input.sectorId()));
             equipment.relocateToSector(newSector);
         }
 
         if (input.gatewayId() != null) {
             Gateway newGateway = gatewayRepository.findById(input.gatewayId())
-                    .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + input.gatewayId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Gateway", input.gatewayId()));
             equipment.connectToGateway(newGateway);
         }
 

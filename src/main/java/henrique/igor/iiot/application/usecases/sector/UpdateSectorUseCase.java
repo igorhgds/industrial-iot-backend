@@ -2,6 +2,8 @@ package henrique.igor.iiot.application.usecases.sector;
 
 import henrique.igor.iiot.application.usecases.sector.dto.UpdateSectorInput;
 import henrique.igor.iiot.domain.entities.Sector;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 
 public class UpdateSectorUseCase {
@@ -14,11 +16,11 @@ public class UpdateSectorUseCase {
 
     public Sector execute(UpdateSectorInput input){
         Sector existingSector = sectorRepository.findById(input.sectorId())
-                .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Sector", input.sectorId()));
 
         if(!existingSector.getName().equalsIgnoreCase(input.name())) {
             sectorRepository.findByName(input.name()).ifPresent(s -> {
-                throw new IllegalArgumentException("Sector with name " + input.name() + " already exists.");
+                throw new ResourceAlreadyExistsException("Sector", "name", input.name());
             });
         }
 

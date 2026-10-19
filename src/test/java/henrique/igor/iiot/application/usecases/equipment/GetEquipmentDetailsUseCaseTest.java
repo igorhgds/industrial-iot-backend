@@ -3,6 +3,8 @@ package henrique.igor.iiot.application.usecases.equipment;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,14 +50,14 @@ class GetEquipmentDetailsUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when equipmentId is null")
+    @DisplayName("Should throw DomainValidationException when equipmentId is null")
     void shouldThrowExceptionWhenEquipmentIdIsNull() {
         // ARRANGE
         UUID nullId = null;
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DomainValidationException exception = assertThrows(
+                DomainValidationException.class,
                 () -> getEquipmentDetailsUseCase.execute(nullId)
         );
 
@@ -64,7 +66,7 @@ class GetEquipmentDetailsUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when equipment is not found")
+    @DisplayName("Should throw ResourceNotFoundException when equipment is not found")
     void shouldThrowExceptionWhenEquipmentNotFound() {
         // ARRANGE
         UUID nonExistentId = UUID.randomUUID();
@@ -72,12 +74,12 @@ class GetEquipmentDetailsUseCaseTest {
         when(equipmentRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> getEquipmentDetailsUseCase.execute(nonExistentId)
         );
 
-        assertTrue(exception.getMessage().contains("Equipment not found with ID: " + nonExistentId));
+        assertTrue(exception.getMessage().contains("Equipment not found with identifier: " + nonExistentId));
         verify(equipmentRepository, times(1)).findById(nonExistentId);
     }
 }

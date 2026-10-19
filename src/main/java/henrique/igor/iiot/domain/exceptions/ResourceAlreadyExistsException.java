@@ -1,6 +1,6 @@
 package henrique.igor.iiot.domain.exceptions;
 
-public class ResourceAlreadyExistsException extends DomainException {
+public class ResourceAlreadyExistsException extends BusinessException {
 
     private final String resource;
     private final String field;

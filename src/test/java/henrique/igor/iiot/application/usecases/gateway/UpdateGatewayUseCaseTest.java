@@ -4,6 +4,7 @@ import henrique.igor.iiot.application.usecases.gateway.dto.UpdateGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -73,7 +74,7 @@ class UpdateGatewayUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when gateway does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when gateway does not exist")
     void shouldThrowExceptionWhenGatewayNotFound() {
         // ARRANGE
         UUID nonExistentId = UUID.randomUUID();
@@ -82,18 +83,18 @@ class UpdateGatewayUseCaseTest {
         when(gatewayRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> updateGatewayUseCase.execute(request)
         );
 
-        assertEquals("Gateway not found with ID: " + nonExistentId, exception.getMessage());
+        assertEquals("Gateway not found with identifier: " + nonExistentId, exception.getMessage());
         verify(gatewayRepository, times(1)).findById(nonExistentId);
         verify(gatewayRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when new sector is not found")
+    @DisplayName("Should throw ResourceNotFoundException when new sector is not found")
     void shouldThrowExceptionWhenNewSectorNotFound() {
         // ARRANGE
         UUID gatewayId = UUID.randomUUID();
@@ -106,12 +107,12 @@ class UpdateGatewayUseCaseTest {
         when(sectorRepository.findById(invalidSectorId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> updateGatewayUseCase.execute(request)
         );
 
-        assertTrue(exception.getMessage().contains("Sector not found with ID: " + invalidSectorId));
+        assertTrue(exception.getMessage().contains("Sector not found with identifier: " + invalidSectorId));
         verify(sectorRepository, times(1)).findById(invalidSectorId);
         verify(gatewayRepository, never()).save(any());
     }

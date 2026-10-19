@@ -1,6 +1,6 @@
 package henrique.igor.iiot.domain.exceptions;
 
-public class ResourceNotFoundException extends DomainException {
+public class ResourceNotFoundException extends BusinessException {
 
     private final String resource;
     private final Object identifier;

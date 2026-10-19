@@ -2,6 +2,8 @@ package henrique.igor.iiot.application.usecases.sector;
 
 import henrique.igor.iiot.application.usecases.sector.dto.UpdateSectorInput;
 import henrique.igor.iiot.domain.entities.Sector;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -93,7 +95,7 @@ class UpdateSectorUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when sector does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when sector does not exist")
     void shouldThrowExceptionWhenSectorDoesNotExist() {
         // ARRANGE
         UUID nonExistentId = UUID.randomUUID();
@@ -102,18 +104,18 @@ class UpdateSectorUseCaseTest {
         when(sectorRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> updateSectorUseCase.execute(request)
         );
 
-        assertEquals("Sector not found with ID: " + nonExistentId, exception.getMessage());
+        assertEquals("Sector not found with identifier: " + nonExistentId, exception.getMessage());
         verify(sectorRepository, times(1)).findById(nonExistentId);
         verify(sectorRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when new name already belongs to another sector")
+    @DisplayName("Should throw ResourceAlreadyExistsException when new name already belongs to another sector")
     void shouldThrowExceptionWhenNewNameAlreadyExists() {
         // ARRANGE
         UUID sectorId = UUID.randomUUID();
@@ -130,8 +132,8 @@ class UpdateSectorUseCaseTest {
         when(sectorRepository.findByName("Line B")).thenReturn(Optional.of(anotherSector));
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = assertThrows(
+                ResourceAlreadyExistsException.class,
                 () -> updateSectorUseCase.execute(request)
         );
 
