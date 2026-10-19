@@ -9,9 +9,13 @@ import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.ActuatorJp
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Repository
 public class ActuatorPersistenceAdapter implements ActuatorRepository {
+
+    private static final Pattern CODE_SEQUENCE_PATTERN = Pattern.compile("^[A-Z0-9]+-(\\d+)-[A-Z0-9]+$");
 
     private final ActuatorJpaRepository actuatorJpaRepository;
 
@@ -52,12 +56,22 @@ public class ActuatorPersistenceAdapter implements ActuatorRepository {
     }
 
     @Override
-    public long countByEquipmentIdAndActuatorType(UUID equipmentId, ActuatorType actuatorType) {
-        return actuatorJpaRepository.countByEquipment_EquipmentIdAndActuatorType(equipmentId, actuatorType);
+    public Optional<Long> findMaxSequenceByEquipmentIdAndType(UUID equipmentId, ActuatorType actuatorType) {
+        List<String> codes = actuatorJpaRepository.findCodesByEquipmentIdAndType(equipmentId, actuatorType);
+        return extractMaxSequence(codes);
     }
 
     @Override
-    public long countByCountEquipementIdIsNullAndActuatorType(ActuatorType actuatorType) {
-        return actuatorJpaRepository.countByEquipmentIsNullAndActuatorType(actuatorType);
+    public Optional<Long> findMaxSequenceForUnassignedEquipment(ActuatorType actuatorType) {
+        List<String> codes = actuatorJpaRepository.findCodesByEquipmentIsNullAndType(actuatorType);
+        return extractMaxSequence(codes);
+    }
+
+    private Optional<Long> extractMaxSequence(List<String> codes) {
+        return codes.stream()
+                .map(CODE_SEQUENCE_PATTERN::matcher)
+                .filter(Matcher::matches)
+                .map(matcher -> Long.parseLong(matcher.group(1)))
+                .max(Long::compareTo);
     }
 }

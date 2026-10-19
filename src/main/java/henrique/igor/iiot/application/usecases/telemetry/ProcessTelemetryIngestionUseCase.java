@@ -2,6 +2,8 @@ package henrique.igor.iiot.application.usecases.telemetry;
 
 import henrique.igor.iiot.domain.entities.*;
 import henrique.igor.iiot.domain.entities.enums.HealthStatus;
+import henrique.igor.iiot.domain.exceptions.GatewayMismatchException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.*;
 import henrique.igor.iiot.infrastructure.messaging.dto.ReadingDTO;
 import henrique.igor.iiot.infrastructure.messaging.dto.TelemetryPayloadDTO;
@@ -27,20 +29,20 @@ public class ProcessTelemetryIngestionUseCase {
 
     public void execute(TelemetryPayloadDTO payloadDTO, String rawPayload) {
         Equipment equipment = equipmentRepository.findByEquipCode(payloadDTO.equipCode())
-                .orElseThrow(() -> new IllegalArgumentException("Equipment not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Equipment", payloadDTO.equipCode()));
 
         Gateway gateway = gatewayRepository.findByCode(payloadDTO.gatewayCode())
-                .orElseThrow(() -> new IllegalArgumentException("Gateway not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Gateway", payloadDTO.gatewayCode()));
 
         if(equipment.getGateway() == null || !equipment.getGateway().getGatewayCode().equals(gateway.getGatewayCode())){
-            throw new IllegalArgumentException("Gateway does not belong to equipment");
+            throw new GatewayMismatchException("Gateway does not belong to equipment");
         }
 
         OffsetDateTime timestamp = payloadDTO.timestamp() != null ? payloadDTO.timestamp() : OffsetDateTime.now();
 
         for (ReadingDTO reading : payloadDTO.readings()) {
             Sensor sensor = sensorRepository.findByCode(reading.sensorCode())
-                    .orElseThrow(() -> new IllegalArgumentException("Sensor not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Sensor", reading.sensorCode()));
 
             TelemetryData telemetryData = new TelemetryData(
                     sensor,

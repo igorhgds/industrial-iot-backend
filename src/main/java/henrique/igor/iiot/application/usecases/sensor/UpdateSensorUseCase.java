@@ -3,6 +3,7 @@ package henrique.igor.iiot.application.usecases.sensor;
 import henrique.igor.iiot.application.usecases.sensor.dto.UpdateSensorInput;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.Sensor;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
 import henrique.igor.iiot.domain.services.SensorCodeGenerator;
@@ -26,7 +27,7 @@ public class UpdateSensorUseCase {
 
     public Sensor execute(UpdateSensorInput input) {
         Sensor sensor = sensorRepository.findById(input.sensorId())
-                .orElseThrow(() -> new IllegalArgumentException("Sensor not found with ID: " + input.sensorId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Sensor", input.sensorId()));
 
         if (input.status() != null) {
             sensor.changeStatus(input.status());
@@ -40,7 +41,7 @@ public class UpdateSensorUseCase {
             UUID currentEquipId = sensor.getEquipment() != null ? sensor.getEquipment().getEquipmentId() : null;
             if (!Objects.equals(currentEquipId, input.equipmentId())) {
                 Equipment newEquipment = equipmentRepository.findById(input.equipmentId())
-                        .orElseThrow(() -> new IllegalArgumentException("Equipment not found with ID: " + input.equipmentId()));
+                        .orElseThrow(() -> new ResourceNotFoundException("Equipment", input.equipmentId()));
 
                 String newCode = sensorCodeGenerator.generate(sensor.getSensorType(), newEquipment);
                 sensor.relocateToEquipment(newEquipment, newCode);

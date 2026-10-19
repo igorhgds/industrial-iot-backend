@@ -7,6 +7,8 @@ import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
 import henrique.igor.iiot.domain.entities.enums.HealthStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorType;
+import henrique.igor.iiot.domain.exceptions.GatewayMismatchException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.*;
 import henrique.igor.iiot.infrastructure.messaging.dto.ReadingDTO;
 import henrique.igor.iiot.infrastructure.messaging.dto.TelemetryPayloadDTO;
@@ -136,40 +138,40 @@ class ProcessTelemetryIngestionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when equipment is not found")
+    @DisplayName("Should throw ResourceNotFoundException when equipment is not found")
     void shouldThrowExceptionWhenEquipmentNotFound() {
         // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
         );
 
-        assertEquals("Equipment not found", exception.getMessage());
+        assertEquals("Equipment not found with identifier: MTR-USI-001", exception.getMessage());
         verifyNoInteractions(sensorRepository, telemetryDataRepository, equipmentStateRepository);
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when gateway is not found")
+    @DisplayName("Should throw ResourceNotFoundException when gateway is not found")
     void shouldThrowExceptionWhenGatewayNotFound() {
         // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
         when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
         );
 
-        assertEquals("Gateway not found", exception.getMessage());
+        assertEquals("Gateway not found with identifier: GW-USI-001", exception.getMessage());
         verifyNoInteractions(sensorRepository, telemetryDataRepository, equipmentStateRepository);
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when gateway does not belong to equipment")
+    @DisplayName("Should throw GatewayMismatchException when gateway does not belong to equipment")
     void shouldThrowExceptionWhenGatewayDoesNotBelongToEquipment() {
         // ARRANGE
         Gateway otherGateway = new Gateway(UUID.randomUUID(), "GW-99-OTHER", "MAC-2", "192.168.1.2", "v1", GatewayStatus.ONLINE, null, null, null);
@@ -178,8 +180,8 @@ class ProcessTelemetryIngestionUseCaseTest {
         when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.of(otherGateway));
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        GatewayMismatchException exception = assertThrows(
+                GatewayMismatchException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
         );
 
@@ -188,7 +190,7 @@ class ProcessTelemetryIngestionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when sensor is not found")
+    @DisplayName("Should throw ResourceNotFoundException when sensor is not found")
     void shouldThrowExceptionWhenSensorNotFound() {
         // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
@@ -196,12 +198,12 @@ class ProcessTelemetryIngestionUseCaseTest {
         when(sensorRepository.findByCode("VOL-001-MTR-USI-001")).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
         );
 
-        assertEquals("Sensor not found", exception.getMessage());
+        assertEquals("Sensor not found with identifier: VOL-001-MTR-USI-001", exception.getMessage());
         verify(telemetryDataRepository, never()).save(any());
         verify(equipmentStateRepository, never()).save(any());
     }

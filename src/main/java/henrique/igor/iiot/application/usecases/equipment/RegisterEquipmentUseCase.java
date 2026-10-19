@@ -2,6 +2,7 @@ package henrique.igor.iiot.application.usecases.equipment;
 
 import henrique.igor.iiot.application.usecases.equipment.dto.RegisterEquipmentInput;
 import henrique.igor.iiot.domain.entities.*;
+import henrique.igor.iiot.domain.exceptions.*;
 import henrique.igor.iiot.domain.repositories.*;
 import henrique.igor.iiot.domain.services.EquipmentCodeGenerator;
 
@@ -24,19 +25,19 @@ public class RegisterEquipmentUseCase {
 
     public Equipment execute(RegisterEquipmentInput input) {
         if (input.type() == null) {
-            throw new IllegalArgumentException("Equipment type cannot be null.");
+            throw new DomainValidationException("Equipment type cannot be null.");
         }
 
         Sector sector = null;
         if (input.sectorId() != null) {
             sector = sectorRepository.findById(input.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Sector", input.sectorId()));
         }
 
         Gateway gateway = null;
         if (input.gatewayId() != null) {
             gateway = gatewayRepository.findById(input.gatewayId())
-                    .orElseThrow(() -> new IllegalArgumentException("Gateway not found with ID: " + input.gatewayId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Gateway", input.gatewayId()));
         }
 
         String equipCode = input.equipCode();
@@ -44,7 +45,7 @@ public class RegisterEquipmentUseCase {
             equipCode = equipmentCodeGenerator.generate(input.type(), sector);
         } else {
             if (equipmentRepository.findByEquipCode(equipCode).isPresent()) {
-                throw new IllegalArgumentException("Equipment with code " + equipCode + " already exists.");
+                throw new ResourceAlreadyExistsException("Equipment", "code", equipCode);
             }
         }
 

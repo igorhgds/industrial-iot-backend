@@ -4,6 +4,8 @@ import henrique.igor.iiot.application.usecases.gateway.dto.RegisterGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import henrique.igor.iiot.domain.services.GatewayCodeGenerator;
@@ -102,7 +104,7 @@ class RegisterGatewayUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when gateway code already exists")
+    @DisplayName("Should throw ResourceAlreadyExistsException when gateway code already exists")
     void shouldThrowExceptionWhenCodeAlreadyExists() {
         // ARRANGE
         RegisterGatewayInput request = new RegisterGatewayInput(
@@ -117,8 +119,8 @@ class RegisterGatewayUseCaseTest {
         when(gatewayRepository.findByCode(request.code())).thenReturn(Optional.of(existingGateway));
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = assertThrows(
+                ResourceAlreadyExistsException.class,
                 () -> registerGatewayUseCase.execute(request)
         );
 
@@ -128,7 +130,7 @@ class RegisterGatewayUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when sectorId is not found")
+    @DisplayName("Should throw ResourceNotFoundException when sectorId is not found")
     void shouldThrowExceptionWhenSectorNotFound() {
         // ARRANGE
         UUID nonExistentSectorId = UUID.randomUUID();
@@ -143,12 +145,12 @@ class RegisterGatewayUseCaseTest {
         when(sectorRepository.findById(nonExistentSectorId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> registerGatewayUseCase.execute(request)
         );
 
-        assertTrue(exception.getMessage().contains("Sector not found with ID: " + nonExistentSectorId));
+        assertTrue(exception.getMessage().contains("Sector not found with identifier: " + nonExistentSectorId));
         verify(sectorRepository, times(1)).findById(nonExistentSectorId);
         verify(gatewayRepository, never()).save(any());
     }

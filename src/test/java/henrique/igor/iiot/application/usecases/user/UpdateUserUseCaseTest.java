@@ -4,6 +4,8 @@ import henrique.igor.iiot.application.usecases.user.dto.UpdateUserInput;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.enums.UserRole;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -104,7 +106,7 @@ class UpdateUserUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when user does not exist")
+    @DisplayName("Should throw ResourceNotFoundException when user does not exist")
     void shouldThrowExceptionWhenUserNotFound() {
         // ARRANGE
         UUID nonExistentUserId = UUID.randomUUID();
@@ -113,18 +115,18 @@ class UpdateUserUseCaseTest {
         when(userRepository.findById(nonExistentUserId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> updateUserUseCase.execute(request)
         );
 
-        assertEquals("User not found with ID: " + nonExistentUserId, exception.getMessage());
+        assertEquals("User not found with identifier: " + nonExistentUserId, exception.getMessage());
         verify(userRepository, times(1)).findById(nonExistentUserId);
         verify(userRepository, never()).save(any());
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when new email already belongs to another user")
+    @DisplayName("Should throw ResourceAlreadyExistsException when new email already belongs to another user")
     void shouldThrowExceptionWhenEmailAlreadyExists() {
         // ARRANGE
         UUID userId = UUID.randomUUID();
@@ -143,8 +145,8 @@ class UpdateUserUseCaseTest {
         when(userRepository.findByEmail("user2@example.com")).thenReturn(Optional.of(anotherUser));
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = assertThrows(
+                ResourceAlreadyExistsException.class,
                 () -> updateUserUseCase.execute(request)
         );
 

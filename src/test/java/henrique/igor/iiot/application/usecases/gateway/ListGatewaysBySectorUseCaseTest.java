@@ -3,6 +3,8 @@ package henrique.igor.iiot.application.usecases.gateway;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -57,14 +59,14 @@ class ListGatewaysBySectorUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when sectorId is null")
+    @DisplayName("Should throw DomainValidationException when sectorId is null")
     void shouldThrowExceptionWhenSectorIdIsNull() {
         // ARRANGE
         UUID nullSectorId = null;
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DomainValidationException exception = assertThrows(
+                DomainValidationException.class,
                 () -> listGatewaysBySectorUseCase.execute(nullSectorId)
         );
 
@@ -74,7 +76,7 @@ class ListGatewaysBySectorUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when sector is not found")
+    @DisplayName("Should throw ResourceNotFoundException when sector is not found")
     void shouldThrowExceptionWhenSectorNotFound() {
         // ARRANGE
         UUID nonExistentSectorId = UUID.randomUUID();
@@ -82,12 +84,12 @@ class ListGatewaysBySectorUseCaseTest {
         when(sectorRepository.findById(nonExistentSectorId)).thenReturn(Optional.empty());
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> listGatewaysBySectorUseCase.execute(nonExistentSectorId)
         );
 
-        assertTrue(exception.getMessage().contains("Sector not found with ID: " + nonExistentSectorId));
+        assertEquals("Sector not found with identifier: " + nonExistentSectorId, exception.getMessage());
         verify(sectorRepository, times(1)).findById(nonExistentSectorId);
         verify(gatewayRepository, never()).findBySectorId(any());
     }

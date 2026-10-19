@@ -6,6 +6,8 @@ import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorType;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -80,7 +82,7 @@ class ListSensorByEquipmentUseCaseTest {
     @Test
     @DisplayName("Should throw exception when equipmentId is null")
     void shouldThrowExceptionWhenEquipmentIdIsNull() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        DomainValidationException exception = assertThrows(DomainValidationException.class,
                 () -> listSensorByEquipmentUseCase.execute(null));
 
         assertEquals("Equipment ID cannot be null.", exception.getMessage());
@@ -94,10 +96,10 @@ class ListSensorByEquipmentUseCaseTest {
         UUID equipmentId = UUID.randomUUID();
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> listSensorByEquipmentUseCase.execute(equipmentId));
 
-        assertEquals("Equipment not found with ID: " + equipmentId, exception.getMessage());
+        assertEquals("Equipment not found with identifier: " + equipmentId, exception.getMessage());
         verify(equipmentRepository, times(1)).findById(equipmentId);
         verify(sensorRepository, never()).findByEquipmentId(any());
     }
