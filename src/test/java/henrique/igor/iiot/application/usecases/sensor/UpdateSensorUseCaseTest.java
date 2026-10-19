@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.entities.enums.SensorStatus;
 import henrique.igor.iiot.domain.entities.enums.SensorType;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
 import henrique.igor.iiot.domain.services.SensorCodeGenerator;
@@ -108,10 +109,10 @@ class UpdateSensorUseCaseTest {
 
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> updateSensorUseCase.execute(request));
 
-        assertEquals("Sensor not found with ID: " + sensorId, exception.getMessage());
+        assertEquals("Sensor not found with identifier: " + sensorId, exception.getMessage());
     }
 
     @Test
@@ -126,9 +127,9 @@ class UpdateSensorUseCaseTest {
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(existingSensor));
         when(equipmentRepository.findById(newEquipId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> updateSensorUseCase.execute(request));
 
-        assertEquals("Equipment not found with ID: " + newEquipId, exception.getMessage());
+        assertEquals("Equipment not found with identifier: " + newEquipId, exception.getMessage());
     }
 }

@@ -1,6 +1,8 @@
 package henrique.igor.iiot.application.usecases.gateway;
 
 import henrique.igor.iiot.domain.entities.Gateway;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 
@@ -19,11 +21,11 @@ public class ListGatewaysBySectorUseCase {
 
     public List<Gateway> execute(UUID sectorId) {
         if (sectorId == null) {
-            throw new IllegalArgumentException("Sector ID cannot be null.");
+            throw new DomainValidationException("Sector ID cannot be null.");
         }
 
         sectorRepository.findById(sectorId)
-                .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + sectorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Sector", sectorId));
 
         return gatewayRepository.findBySectorId(sectorId);
     }

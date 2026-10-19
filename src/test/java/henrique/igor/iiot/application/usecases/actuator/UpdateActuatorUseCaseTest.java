@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.entities.enums.ActuatorStatus;
 import henrique.igor.iiot.domain.entities.enums.ActuatorType;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.ActuatorRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.services.ActuatorCodeGenerator;
@@ -107,10 +108,10 @@ class UpdateActuatorUseCaseTest {
 
         when(actuatorRepository.findById(actuatorId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> updateActuatorUseCase.execute(input));
 
-        assertEquals("Actuator not found with ID: " + actuatorId, exception.getMessage());
+        assertEquals("Actuator not found with identifier: " + actuatorId, exception.getMessage());
         verify(actuatorRepository, never()).save(any());
     }
 
@@ -126,10 +127,10 @@ class UpdateActuatorUseCaseTest {
         when(actuatorRepository.findById(actuatorId)).thenReturn(Optional.of(existing));
         when(equipmentRepository.findById(newEquipId)).thenReturn(Optional.empty());
 
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> updateActuatorUseCase.execute(input));
 
-        assertEquals("Equipment not found with ID: " + newEquipId, exception.getMessage());
+        assertEquals("Equipment not found with identifier: " + newEquipId, exception.getMessage());
         verify(actuatorRepository, never()).save(any());
     }
 }

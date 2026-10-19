@@ -12,25 +12,31 @@ public class ActuatorCodeGenerator {
         this.actuatorRepository = actuatorRepository;
     }
 
-    public String generate(ActuatorType type, Equipment equipment){
-        String typePrefix = getActuatorTypePrefix(type);
-        String equipRef;
-        long count;
-
-        if(equipment != null && equipment.getEquipCode() != null && !equipment.getEquipCode().isBlank()){
-            equipRef = equipment.getEquipCode();
-            count = actuatorRepository.countByEquipmentIdAndActuatorType(equipment.getEquipmentId(), type);
-        } else {
-            equipRef = "GEN";
-            count = actuatorRepository.countByCountEquipementIdIsNullAndActuatorType(type);
+    public String generate(ActuatorType type, Equipment equipment) {
+        if (type == null) {
+            throw new IllegalArgumentException("ActuatorType cannot be null.");
         }
 
-        String sequence = String.format("%03d", count + 1);
+        String typePrefix = getActuatorTypePrefix(type);
+        String equipRef;
+        long nextSequence;
+
+        if (equipment != null && equipment.getEquipCode() != null && !equipment.getEquipCode().isBlank()) {
+            equipRef = equipment.getEquipCode().trim();
+            nextSequence = actuatorRepository.findMaxSequenceByEquipmentIdAndType(equipment.getEquipmentId(), type)
+                    .orElse(0L) + 1;
+        } else {
+            equipRef = "GEN";
+            nextSequence = actuatorRepository.findMaxSequenceForUnassignedEquipment(type)
+                    .orElse(0L) + 1;
+        }
+
+        String sequence = String.format("%03d", nextSequence);
         return typePrefix + "-" + sequence + "-" + equipRef;
     }
 
-    private String getActuatorTypePrefix(ActuatorType type){
-        return switch (type){
+    private String getActuatorTypePrefix(ActuatorType type) {
+        return switch (type) {
             case MOTOR -> "MOT";
             case RELAY -> "REL";
             case VALVE -> "VAL";

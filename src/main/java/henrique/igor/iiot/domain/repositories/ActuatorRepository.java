@@ -17,7 +17,7 @@ public interface ActuatorRepository {
 
     void deleteById(UUID actuatorId);
 
-    long countByEquipmentIdAndActuatorType(UUID equipmentId, ActuatorType actuatorType);
+    Optional<Long> findMaxSequenceByEquipmentIdAndType(UUID equipmentId, ActuatorType actuatorType);
 
-    long countByCountEquipementIdIsNullAndActuatorType(ActuatorType actuatorType);
+    Optional<Long> findMaxSequenceForUnassignedEquipment(ActuatorType actuatorType);
 }

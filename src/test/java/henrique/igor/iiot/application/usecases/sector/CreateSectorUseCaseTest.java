@@ -2,6 +2,7 @@ package henrique.igor.iiot.application.usecases.sector;
 
 import henrique.igor.iiot.application.usecases.sector.dto.CreateSectorInput;
 import henrique.igor.iiot.domain.entities.Sector;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class CreateSectorUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when name already exists")
+    @DisplayName("Should throw ResourceAlreadyExistsException when name already exists")
     void shouldThrowExceptionWhenNameAlreadyExists(){
         // Arrange
         CreateSectorInput request = new CreateSectorInput(
@@ -64,8 +65,8 @@ class CreateSectorUseCaseTest {
         when(sectorRepository.findByName(request.name())).thenReturn(Optional.of(existingSector));
 
         //Act & Assert
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class, () -> createSectorUseCase.execute(request)
+        ResourceAlreadyExistsException exception = assertThrows(
+                ResourceAlreadyExistsException.class, () -> createSectorUseCase.execute(request)
         );
 
         assertTrue(exception.getMessage().contains("already exists"));

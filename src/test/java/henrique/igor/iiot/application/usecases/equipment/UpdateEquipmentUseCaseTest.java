@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
@@ -81,7 +82,7 @@ class UpdateEquipmentUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should throw IllegalArgumentException when equipment is not found")
+    @DisplayName("Should throw ResourceNotFoundException when equipment is not found")
     void shouldThrowExceptionWhenEquipmentNotFound() {
         // 1. ARRANGE
         UUID nonExistentId = UUID.randomUUID();
@@ -90,12 +91,12 @@ class UpdateEquipmentUseCaseTest {
         when(equipmentRepository.findById(nonExistentId)).thenReturn(Optional.empty());
 
         // 2. ACT & 3. ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceNotFoundException exception = assertThrows(
+                ResourceNotFoundException.class,
                 () -> updateEquipmentUseCase.execute(request)
         );
 
-        assertEquals("Equipment not found with ID: " + nonExistentId, exception.getMessage());
+        assertEquals("Equipment not found with identifier: " + nonExistentId, exception.getMessage());
         verify(equipmentRepository, times(1)).findById(nonExistentId);
         verify(equipmentRepository, never()).save(any());
     }

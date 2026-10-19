@@ -7,6 +7,8 @@ import henrique.igor.iiot.domain.entities.Sector;
 import henrique.igor.iiot.domain.entities.enums.EquipStatus;
 import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
@@ -116,8 +118,8 @@ class RegisterEquipmentUseCaseTest {
         RegisterEquipmentInput request = new RegisterEquipmentInput("MTR-01", null, null, null);
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        DomainValidationException exception = assertThrows(
+                DomainValidationException.class,
                 () -> registerEquipmentUseCase.execute(request)
         );
 
@@ -135,8 +137,8 @@ class RegisterEquipmentUseCaseTest {
         when(equipmentRepository.findByEquipCode("MTR-DUPLICATE")).thenReturn(Optional.of(existingEquipment));
 
         // ACT & ASSERT
-        IllegalArgumentException exception = assertThrows(
-                IllegalArgumentException.class,
+        ResourceAlreadyExistsException exception = assertThrows(
+                ResourceAlreadyExistsException.class,
                 () -> registerEquipmentUseCase.execute(request)
         );
 

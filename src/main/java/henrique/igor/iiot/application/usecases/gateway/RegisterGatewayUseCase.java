@@ -3,6 +3,8 @@ package henrique.igor.iiot.application.usecases.gateway;
 import henrique.igor.iiot.application.usecases.gateway.dto.RegisterGatewayInput;
 import henrique.igor.iiot.domain.entities.Gateway;
 import henrique.igor.iiot.domain.entities.Sector;
+import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
+import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.GatewayRepository;
 import henrique.igor.iiot.domain.repositories.SectorRepository;
 import henrique.igor.iiot.domain.services.GatewayCodeGenerator;
@@ -25,7 +27,7 @@ public class RegisterGatewayUseCase {
         Sector sector = null;
         if (input.sectorId() != null) {
             sector = sectorRepository.findById(input.sectorId())
-                    .orElseThrow(() -> new IllegalArgumentException("Sector not found with ID: " + input.sectorId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Sector", input.sectorId()));
         }
 
         String gatewayCode = input.code();
@@ -33,7 +35,7 @@ public class RegisterGatewayUseCase {
             gatewayCode = gatewayCodeGenerator.generate(sector);
         } else {
             if (gatewayRepository.findByCode(gatewayCode).isPresent()) {
-                throw new IllegalArgumentException("Gateway with code " + gatewayCode + " already exists.");
+                throw new ResourceAlreadyExistsException("Gateway", "code", gatewayCode);
             }
         }
 
