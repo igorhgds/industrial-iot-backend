@@ -19,4 +19,6 @@ public interface RuleGroupRepository {
     List<RuleGroup> findAll();
 
     void deleteById(UUID ruleGroupId);
+
+    Optional<RuleGroup> findByNameAndEquipmentId(String name, UUID equipmentId);
 }
