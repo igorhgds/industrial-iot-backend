@@ -22,7 +22,7 @@ cd simulators && python3 -m venv venv && source venv/bin/activate && pip install
 ## Architecture Overview
 
 - **Java 21**, **Spring Boot 4.1.x**, **Maven**
-- **Clean/Hexagonal Architecture**: `domain/` (pure Java, no Spring), `infrastructure/` (JPA, adapters, mappers)
+- **Clean/Hexagonal Architecture**: `domain/` (pure Java, no Spring), `application/usecases/` (use cases & DTOs), `infrastructure/` (JPA, MQTT consumers, adapters, mappers)
 - **Dual-broker messaging**:
   - **Mosquitto MQTT** (port 1883/9001): telemetry ingestion + actuation commands
   - **RabbitMQ** (port 5672/15672): critical alerts & work orders (guaranteed delivery)
@@ -30,7 +30,7 @@ cd simulators && python3 -m venv venv && source venv/bin/activate && pip install
   1. Config/Master: `equipments`, `sensors`, `actuators`, `gateways`, `rule_groups`, `rule_conditions`
   2. State/Operational: `equipment_state`, `alerts`, `alert_sensor_snapshots`, `work_orders`
   3. Historical: `telemetry_data` (TimescaleDB hypertable)
-- **Flyway** migrations in `src/main/resources/db/migration/` (V1–V16+)
+- **Flyway** migrations in `src/main/resources/db/migration/` (V01–V19+)
 - **Python simulator** publishes to `industry/machinery/{equipmentCode}` every 3s
 
 
@@ -66,8 +66,9 @@ cd simulators && python3 -m venv venv && source venv/bin/activate && pip install
 
 ## Testing
 
-- Only one test exists: context load (`IndustrialIotBackendApplicationTests`)
+- Unit tests cover all application Use Cases (`src/test/java/henrique/igor/iiot/application/usecases/**`) plus context load (`IndustrialIotBackendApplicationTests`)
 - Test dependencies: JUnit 5, Mockito, Spring Boot test starters, Testcontainers (not yet used)
+- Run fast unit test suite: `./mvnw test -Dtest="*UseCaseTest"`
 - Run single test: `./mvnw test -Dtest=IndustrialIotBackendApplicationTests`
 
 ## Simulator

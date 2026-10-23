@@ -29,9 +29,9 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
 ## 🏗 System Architecture Diagram
 
 ```mermaid
-graph TD
+flowchart TD
     subgraph edge_sim ["Edge & Simulators"]
-        MS["Python Motor Simulator (Gateway Payload)"]
+        MS["Python Motor Simulator<br/>(Gateway + Multi-Sensor Payload)"]
     end
 
     subgraph msg_broker ["Messaging Broker Layer"]
@@ -39,36 +39,104 @@ graph TD
         RMQ["🐇 RabbitMQ AMQP Broker (AMQP :5672 / Mgmt :15672)<br/>[Critical Alerts & Work Orders]"]
     end
 
-    subgraph backend_core ["Backend Core (Spring Boot 4.1 / Java 21)"]
-        ING["📥 Telemetry Ingestion Consumer"]
-        UC["⚙️ Clean Architecture Use Cases (ProcessTelemetryUseCase)"]
-        RULES["⚡ Dynamic Rules Engine (in Java Domain)"]
+    subgraph backend_core ["Backend Core (Spring Boot 4.1 / Java 21 - Clean Architecture)"]
+        ING["📥 TelemetryMqttConsumer"]
+        INGEST_UC["⚙️ ProcessTelemetryIngestionUseCase"]
+        ANOMALY_UC["🔍 ProcessEquipmentAnomaliesUseCase"]
+        EVAL_UC["⚡ EvaluateRuleGroupUseCase<br/>(Dynamic Rules Engine: AND / OR)"]
+        ALERT_UC["🚨 TriggerAlertUseCase<br/>(Acknowledge / Dismiss Lifecycle)"]
+        ACT_UC["🎛️ ExecuteActuationCommandUseCase<br/>(ActuationCommandPublisher Port)"]
         HVAC["🌡️ HVAC Thermal Controller Module"]
-        ALERT["🚨 Alert & Work Order Dispatcher"]
     end
 
     subgraph persistence ["Persistence & Storage Layer"]
-        PG[("🐘 PostgreSQL 16 (Config, State, Rules)")]
-        TS[("⏱️ TimescaleDB Hypertable (telemetry_data)")]
-        FLY["✈️ Flyway Migrations"]
+        PG[("🐘 PostgreSQL 16<br/>(Config, EquipmentState, Alerts, Snapshots, Rules)")]
+        TS[("⏱️ TimescaleDB Hypertable<br/>(telemetry_data)")]
+        FLY["✈️ Flyway Migrations (V01–V19)"]
     end
 
     subgraph frontend_layer ["Web & Frontend Layer"]
         ANG["🅰️ Angular Real-Time Dashboard (WebSockets / SSE)"]
     end
 
-    MS -->|1. Publish Gateway Payload| MQTT
-    MQTT -->|2. Consume Sensor Stream| ING
-    ING --> UC
-    UC -->|3. Save Time-Series Readings| TS
-    UC --> RULES
-    RULES -->|4. Update Current Health Status| PG
-    FLY -.->|Schema Versioning| PG
-    RULES -->|5. Detect Anomaly & Trigger Alert| ALERT
-    ALERT -->|6. Publish Guaranteed Event| RMQ
-    RULES -->|7. Thermal Management Rule| HVAC
-    HVAC -->|8. Actuation Command| MQTT
-    UC -->|9. Real-Time Stream| ANG
+    MS -->|"1. Publish industry/machinery/{equipCode}"| MQTT
+    MQTT -->|"2. Consume Sensor Stream"| ING
+    ING --> INGEST_UC
+    INGEST_UC -->|"3. Save Time-Series Readings"| TS
+    INGEST_UC -->|"4. Delegate Anomaly Check"| ANOMALY_UC
+    ANOMALY_UC -->|"5. Evaluate Active RuleGroups"| EVAL_UC
+    EVAL_UC -.->|"6. Trigger on Breach"| ALERT_UC
+    ALERT_UC -->|"7. Persist Alert + Sensor Snapshots"| PG
+    ANOMALY_UC -->|"8. Return Calculated HealthStatus"| INGEST_UC
+    INGEST_UC -->|"9. Update O(1) EquipmentState"| PG
+    FLY -.->|"Schema Versioning"| PG
+    ALERT_UC -.->|"10. Publish Critical Event"| RMQ
+    EVAL_UC -.->|"11. Closed-Loop AutomationRule"| ACT_UC
+    EVAL_UC -.->|"12. Thermal Management Rule"| HVAC
+    ACT_UC -->|"13. Publish Command to commandMqttTopic"| MQTT
+    HVAC -->|"14. Actuation Command"| MQTT
+    INGEST_UC -.->|"15. Real-Time Stream"| ANG
+```
+
+---
+
+## 🔄 Telemetry, Dynamic Rules & Alert Lifecycle Flow
+
+For the full Portuguese documentation and detailed diagrams, see [docs/telemetry-and-rules-flow.md](docs/telemetry-and-rules-flow.md).
+
+### End-to-End Ingestion & Rules Evaluation Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant MQTT as Mosquitto MQTT
+    participant Consumer as TelemetryMqttConsumer
+    participant IngestUC as ProcessTelemetryIngestionUseCase
+    participant AnomalyUC as ProcessEquipmentAnomaliesUseCase
+    participant EvalUC as EvaluateRuleGroupUseCase
+    participant AlertUC as TriggerAlertUseCase
+    participant AutoUC as ExecuteActuationCommandUseCase
+    participant DB as PostgreSQL / TimescaleDB
+
+    MQTT->>Consumer: JSON Payload (equipCode, gatewayCode, readings[])
+    Consumer->>IngestUC: execute(payloadDTO, rawPayload)
+
+    IngestUC->>DB: Validate Equipment & Gateway
+    loop For each ReadingDTO in payload
+        IngestUC->>DB: Find Sensor & Save TelemetryData (TimescaleDB)
+        Note over IngestUC: Collect Map<sensorId, value>
+    end
+
+    IngestUC->>AnomalyUC: execute(equipment, sensorReadings)
+    AnomalyUC->>DB: Fetch RuleGroups for Equipment
+    loop For each active RuleGroup
+        AnomalyUC->>EvalUC: execute(ruleGroupId, sensorReadings)
+        EvalUC->>DB: Fetch RuleConditions
+        Note over EvalUC: Evaluate operators (>, <, =, >=, <=)<br/>& apply logical operator (AND / OR)
+        EvalUC-->>AnomalyUC: RuleEvaluationResult (triggered, severity, snapshots)
+
+        alt If triggered == true (Anomaly Detected)
+            AnomalyUC->>AlertUC: execute(TriggerAlertInput)
+            AlertUC->>DB: Save Alert (PENDING) + AlertSensorSnapshots
+            opt If active AutomationRule exists
+                AnomalyUC->>AutoUC: execute(ExecuteActuationCommandInput)
+                AutoUC->>MQTT: Publish command to Actuator commandMqttTopic
+            end
+        end
+    end
+    AnomalyUC-->>IngestUC: Optional<HealthStatus> (HEALTH, WARNING, CRITICAL)
+    IngestUC->>DB: Save EquipmentState (O(1) current state)
+```
+
+### Alert Lifecycle State Machine
+
+```mermaid
+stateDiagram-v2
+    [*] --> PENDING: TriggerAlertUseCase (Automated via Telemetry)
+    PENDING --> ACKNOWLEDGED: AcknowledgeAlertUseCase (Operator acknowledges)
+    PENDING --> RESOLVED: DismissAlertUseCase (Direct resolution)
+    ACKNOWLEDGED --> RESOLVED: DismissAlertUseCase (Operator resolves/closes)
+    RESOLVED --> [*]
 ```
 
 ---
@@ -161,7 +229,16 @@ Verify service ports:
 - **Mosquitto MQTT:** `localhost:1883` (MQTT), `localhost:9001` (WebSockets)
 - **RabbitMQ:** `localhost:5672` (AMQP), `http://localhost:15672` (Management Console — User: `iiot` / Pass: `iiot`)
 
-### 4. Run the Motor Telemetry Simulator
+### 4. Run the Spring Boot Backend & Tests
+```bash
+# Run the application
+./mvnw spring-boot:run
+
+# Run the unit test suite
+./mvnw test -Dtest="*UseCaseTest"
+```
+
+### 5. Run the Motor Telemetry Simulator
 Set up a Python virtual environment and run the simulator:
 ```bash
 cd simulators
@@ -170,7 +247,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
 python main.py
 ```
-You will see real-time JSON telemetry payloads being published to Mosquitto MQTT topic `industry/machinery/MTR-5CV-01` every 3 seconds.
+You will see real-time JSON telemetry payloads being published to Mosquitto MQTT topic `industry/machinery/MTR-USI-001` every 3 seconds.
 
 ---
 
@@ -178,8 +255,12 @@ You will see real-time JSON telemetry payloads being published to Mosquitto MQTT
 
 ```
 industrial-iot-backend/
-├── docker-compose.yml           # Local infrastructure stack (Postgres, Mosquitto, RabbitMQ)
+├── AGENTS.md                    # Architectural guidelines & developer quick commands
+├── docker-compose.yml           # Local infrastructure stack (TimescaleDB, Mosquitto, RabbitMQ)
 ├── GITHUB_BACKLOG.md            # Detailed milestone tasks & issue definitions
+├── docs/                        # Architecture & workflow documentation
+│   ├── database-schemav1.dbml   # Database schema specification
+│   └── telemetry-and-rules-flow.md # Detailed Mermaid flows (Ingestion, Rules, Alerts)
 ├── infra/                       # Infrastructure configuration files
 │   └── mosquitto/
 │       └── config/
@@ -190,11 +271,14 @@ industrial-iot-backend/
 │   └── requirements.txt         # Paho-MQTT dependencies
 ├── src/                         # Spring Boot application source code
 │   ├── main/
-│   │   ├── java/                # Clean Architecture layers (Domain, Use Cases, Controllers)
+│   │   ├── java/henrique/igor/iiot/
+│   │   │   ├── application/usecases/ # Clean Architecture Use Cases & DTOs
+│   │   │   ├── domain/               # Pure Java Entities, Enums, Exceptions, Ports & Repo Interfaces
+│   │   │   └── infrastructure/       # Messaging (MQTT), Persistence (JPA Entities, Mappers, Adapters)
 │   │   └── resources/
-│   │       ├── application.yaml # Spring Boot configurations
-│   │       └── db/migration/    # Flyway SQL migration scripts
-│   └── test/                    # JUnit 5 & Mockito test suites
+│   │       ├── application.yaml      # Spring Boot configurations
+│   │       └── db/migration/         # Flyway SQL migration scripts (V01–V19)
+│   └── test/                         # JUnit 5 & Mockito unit test suites
 └── pom.xml                      # Maven dependencies & build setup
 ```
 
