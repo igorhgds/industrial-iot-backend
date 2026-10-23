@@ -30,6 +30,18 @@ public class AutomationRule {
         this.isActive = isActive;
     }
 
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    public void toggle() {
+        this.isActive = !Boolean.TRUE.equals(this.isActive);
+    }
+
     public UUID getAutomationId() {return automationId;}
     public String getName() {return name;}
     public Sensor getInputSensorId() {return inputSensorId;}

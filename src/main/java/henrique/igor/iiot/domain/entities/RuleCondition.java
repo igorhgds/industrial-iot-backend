@@ -25,6 +25,20 @@ public class RuleCondition {
         this.thresholdValue = thresholdValue;
     }
 
+    public boolean evaluate(BigDecimal value) {
+        if (value == null || thresholdValue == null || operator == null) {
+            return false;
+        }
+        int comparison = value.compareTo(thresholdValue);
+        return switch (operator) {
+            case GREATER_THAN -> comparison > 0;
+            case LESS_THAN -> comparison < 0;
+            case EQUALS -> comparison == 0;
+            case GREATER_THAN_OR_EQUAL -> comparison >= 0;
+            case LESS_THAN_OR_EQUAL -> comparison <= 0;
+        };
+    }
+
     public UUID getConditionId() {return conditionId;}
     public RuleGroup getRuleGroup() {return ruleGroup;}
     public Sensor getSensor() {return sensor;}

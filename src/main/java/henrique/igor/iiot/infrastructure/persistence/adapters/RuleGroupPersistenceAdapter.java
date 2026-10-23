@@ -61,4 +61,10 @@ public class RuleGroupPersistenceAdapter implements RuleGroupRepository {
     public void deleteById(UUID ruleGroupId) {
         ruleGroupJpaRepository.deleteById(ruleGroupId);
     }
+
+    @Override
+    public Optional<RuleGroup> findByNameAndEquipmentId(String name, UUID equipmentId) {
+        return ruleGroupJpaRepository.findByNameAndEquipmentEquipmentId(name, equipmentId)
+                .map(RuleGroupMapper::toDomain);
+    }
 }

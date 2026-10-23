@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -13,4 +14,6 @@ public interface RuleGroupJpaRepository extends JpaRepository<RuleGroupJpaEntity
     List<RuleGroupJpaEntity> findByEquipmentEquipmentId(UUID equipmentId);
 
     List<RuleGroupJpaEntity> findByIsActiveTrue();
+
+    Optional<RuleGroupJpaEntity> findByNameAndEquipmentEquipmentId(String name, UUID equipmentId);
 }

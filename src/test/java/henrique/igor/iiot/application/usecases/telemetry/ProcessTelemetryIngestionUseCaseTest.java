@@ -1,12 +1,7 @@
 package henrique.igor.iiot.application.usecases.telemetry;
 
 import henrique.igor.iiot.domain.entities.*;
-import henrique.igor.iiot.domain.entities.enums.EquipStatus;
-import henrique.igor.iiot.domain.entities.enums.EquipType;
-import henrique.igor.iiot.domain.entities.enums.GatewayStatus;
-import henrique.igor.iiot.domain.entities.enums.HealthStatus;
-import henrique.igor.iiot.domain.entities.enums.SensorStatus;
-import henrique.igor.iiot.domain.entities.enums.SensorType;
+import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.GatewayMismatchException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.*;
@@ -29,6 +24,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +45,9 @@ class ProcessTelemetryIngestionUseCaseTest {
     @Mock
     private EquipmentStateRepository equipmentStateRepository;
 
+    @Mock
+    private ProcessEquipmentAnomaliesUseCase processEquipmentAnomaliesUseCase;
+
     @InjectMocks
     private ProcessTelemetryIngestionUseCase processTelemetryIngestionUseCase;
 
@@ -65,7 +64,6 @@ class ProcessTelemetryIngestionUseCaseTest {
         timestamp = OffsetDateTime.now();
         rawPayload = "{\"equipCode\":\"MTR-USI-001\",\"gatewayCode\":\"GW-USI-001\"}";
 
-        // Codes aligned with EquipmentCodeGenerator, GatewayCodeGenerator, SensorCodeGenerator
         gateway = new Gateway(UUID.randomUUID(), "GW-USI-001", "MAC-1", "192.168.1.1", "v1", GatewayStatus.ONLINE, null, null, null);
         equipment = new Equipment(UUID.randomUUID(), "MTR-USI-001", EquipType.MOTOR, EquipStatus.ACTIVE, null, gateway, OffsetDateTime.now());
 
@@ -88,17 +86,15 @@ class ProcessTelemetryIngestionUseCaseTest {
     @Test
     @DisplayName("Should process telemetry ingestion successfully when initial equipment state does not exist")
     void shouldProcessTelemetryIngestionSuccessfullyWhenStateDoesNotExist() {
-        // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
         when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.of(gateway));
         when(sensorRepository.findByCode("VOL-001-MTR-USI-001")).thenReturn(Optional.of(voltageSensor));
         when(sensorRepository.findByCode("TEM-001-MTR-USI-001")).thenReturn(Optional.of(tempSensor));
         when(equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())).thenReturn(Optional.empty());
+        when(processEquipmentAnomaliesUseCase.execute(eq(equipment), any())).thenReturn(Optional.empty());
 
-        // ACT
         processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload);
 
-        // ASSERT & VERIFY
         verify(telemetryDataRepository, times(2)).save(any(TelemetryData.class));
 
         ArgumentCaptor<EquipmentState> stateCaptor = ArgumentCaptor.forClass(EquipmentState.class);
@@ -112,9 +108,8 @@ class ProcessTelemetryIngestionUseCaseTest {
     }
 
     @Test
-    @DisplayName("Should process telemetry ingestion successfully and preserve existing equipment health status")
+    @DisplayName("Should process telemetry ingestion successfully and preserve existing equipment health status when no rules exist")
     void shouldProcessTelemetryIngestionSuccessfullyWhenStateAlreadyExists() {
-        // ARRANGE
         EquipmentState existingState = new EquipmentState(equipment, HealthStatus.WARNING, "old-payload", timestamp.minusMinutes(5));
 
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
@@ -122,11 +117,10 @@ class ProcessTelemetryIngestionUseCaseTest {
         when(sensorRepository.findByCode("VOL-001-MTR-USI-001")).thenReturn(Optional.of(voltageSensor));
         when(sensorRepository.findByCode("TEM-001-MTR-USI-001")).thenReturn(Optional.of(tempSensor));
         when(equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())).thenReturn(Optional.of(existingState));
+        when(processEquipmentAnomaliesUseCase.execute(eq(equipment), any())).thenReturn(Optional.empty());
 
-        // ACT
         processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload);
 
-        // ASSERT & VERIFY
         verify(telemetryDataRepository, times(2)).save(any(TelemetryData.class));
 
         ArgumentCaptor<EquipmentState> stateCaptor = ArgumentCaptor.forClass(EquipmentState.class);
@@ -138,12 +132,27 @@ class ProcessTelemetryIngestionUseCaseTest {
     }
 
     @Test
+    @DisplayName("Should update health status to CRITICAL when anomaly processor detects critical breach")
+    void shouldUpdateHealthStatusToCriticalWhenAnomalyProcessorDetectsBreach() {
+        when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
+        when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.of(gateway));
+        when(sensorRepository.findByCode("VOL-001-MTR-USI-001")).thenReturn(Optional.of(voltageSensor));
+        when(sensorRepository.findByCode("TEM-001-MTR-USI-001")).thenReturn(Optional.of(tempSensor));
+        when(equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())).thenReturn(Optional.empty());
+        when(processEquipmentAnomaliesUseCase.execute(eq(equipment), any())).thenReturn(Optional.of(HealthStatus.CRITICAL));
+
+        processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload);
+
+        ArgumentCaptor<EquipmentState> stateCaptor = ArgumentCaptor.forClass(EquipmentState.class);
+        verify(equipmentStateRepository, times(1)).save(stateCaptor.capture());
+        assertEquals(HealthStatus.CRITICAL, stateCaptor.getValue().getStatus());
+    }
+
+    @Test
     @DisplayName("Should throw ResourceNotFoundException when equipment is not found")
     void shouldThrowExceptionWhenEquipmentNotFound() {
-        // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.empty());
 
-        // ACT & ASSERT
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
@@ -156,11 +165,9 @@ class ProcessTelemetryIngestionUseCaseTest {
     @Test
     @DisplayName("Should throw ResourceNotFoundException when gateway is not found")
     void shouldThrowExceptionWhenGatewayNotFound() {
-        // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
         when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.empty());
 
-        // ACT & ASSERT
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
@@ -173,13 +180,11 @@ class ProcessTelemetryIngestionUseCaseTest {
     @Test
     @DisplayName("Should throw GatewayMismatchException when gateway does not belong to equipment")
     void shouldThrowExceptionWhenGatewayDoesNotBelongToEquipment() {
-        // ARRANGE
         Gateway otherGateway = new Gateway(UUID.randomUUID(), "GW-99-OTHER", "MAC-2", "192.168.1.2", "v1", GatewayStatus.ONLINE, null, null, null);
 
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
         when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.of(otherGateway));
 
-        // ACT & ASSERT
         GatewayMismatchException exception = assertThrows(
                 GatewayMismatchException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
@@ -192,12 +197,10 @@ class ProcessTelemetryIngestionUseCaseTest {
     @Test
     @DisplayName("Should throw ResourceNotFoundException when sensor is not found")
     void shouldThrowExceptionWhenSensorNotFound() {
-        // ARRANGE
         when(equipmentRepository.findByEquipCode("MTR-USI-001")).thenReturn(Optional.of(equipment));
         when(gatewayRepository.findByCode("GW-USI-001")).thenReturn(Optional.of(gateway));
         when(sensorRepository.findByCode("VOL-001-MTR-USI-001")).thenReturn(Optional.empty());
 
-        // ACT & ASSERT
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
                 () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)

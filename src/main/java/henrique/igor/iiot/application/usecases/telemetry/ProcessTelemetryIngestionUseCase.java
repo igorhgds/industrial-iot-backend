@@ -8,8 +8,11 @@ import henrique.igor.iiot.domain.repositories.*;
 import henrique.igor.iiot.infrastructure.messaging.dto.ReadingDTO;
 import henrique.igor.iiot.infrastructure.messaging.dto.TelemetryPayloadDTO;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class ProcessTelemetryIngestionUseCase {
 
@@ -18,13 +21,22 @@ public class ProcessTelemetryIngestionUseCase {
     private final SensorRepository sensorRepository;
     private final TelemetryDataRepository telemetryDataRepository;
     private final EquipmentStateRepository equipmentStateRepository;
+    private final ProcessEquipmentAnomaliesUseCase processEquipmentAnomaliesUseCase;
 
-    public ProcessTelemetryIngestionUseCase(EquipmentRepository equipmentRepository, GatewayRepository gatewayRepository, SensorRepository sensorRepository, TelemetryDataRepository telemetryDataRepository, EquipmentStateRepository equipmentStateRepository) {
+    public ProcessTelemetryIngestionUseCase(
+            EquipmentRepository equipmentRepository,
+            GatewayRepository gatewayRepository,
+            SensorRepository sensorRepository,
+            TelemetryDataRepository telemetryDataRepository,
+            EquipmentStateRepository equipmentStateRepository,
+            ProcessEquipmentAnomaliesUseCase processEquipmentAnomaliesUseCase
+    ) {
         this.equipmentRepository = equipmentRepository;
         this.gatewayRepository = gatewayRepository;
         this.sensorRepository = sensorRepository;
         this.telemetryDataRepository = telemetryDataRepository;
         this.equipmentStateRepository = equipmentStateRepository;
+        this.processEquipmentAnomaliesUseCase = processEquipmentAnomaliesUseCase;
     }
 
     public void execute(TelemetryPayloadDTO payloadDTO, String rawPayload) {
@@ -34,35 +46,30 @@ public class ProcessTelemetryIngestionUseCase {
         Gateway gateway = gatewayRepository.findByCode(payloadDTO.gatewayCode())
                 .orElseThrow(() -> new ResourceNotFoundException("Gateway", payloadDTO.gatewayCode()));
 
-        if(equipment.getGateway() == null || !equipment.getGateway().getGatewayCode().equals(gateway.getGatewayCode())){
+        if (equipment.getGateway() == null || !equipment.getGateway().getGatewayCode().equals(gateway.getGatewayCode())) {
             throw new GatewayMismatchException("Gateway does not belong to equipment");
         }
 
         OffsetDateTime timestamp = payloadDTO.timestamp() != null ? payloadDTO.timestamp() : OffsetDateTime.now();
 
+        Map<UUID, BigDecimal> sensorReadings = new HashMap<>();
+
         for (ReadingDTO reading : payloadDTO.readings()) {
             Sensor sensor = sensorRepository.findByCode(reading.sensorCode())
                     .orElseThrow(() -> new ResourceNotFoundException("Sensor", reading.sensorCode()));
 
-            TelemetryData telemetryData = new TelemetryData(
-                    sensor,
-                    timestamp,
-                    reading.value()
-            );
-            telemetryDataRepository.save(telemetryData);
+            telemetryDataRepository.save(new TelemetryData(sensor, timestamp, reading.value()));
+            sensorReadings.put(sensor.getSensorId(), reading.value());
         }
 
-        Optional<EquipmentState> existingState = equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId());
-        HealthStatus status = existingState.isPresent()
-                ? existingState.get().getStatus()
-                : HealthStatus.HEALTH;
+        HealthStatus existingStatus = equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())
+                .map(EquipmentState::getStatus)
+                .orElse(HealthStatus.HEALTH);
 
-        EquipmentState equipmentState = new EquipmentState(
-                equipment,
-                status,
-                rawPayload,
-                timestamp
-        );
-        equipmentStateRepository.save(equipmentState);
+        HealthStatus status = processEquipmentAnomaliesUseCase
+                .execute(equipment, sensorReadings)
+                .orElse(existingStatus);
+
+        equipmentStateRepository.save(new EquipmentState(equipment, status, rawPayload, timestamp));
     }
 }

@@ -2,6 +2,7 @@ package henrique.igor.iiot.domain.entities;
 
 import henrique.igor.iiot.domain.entities.enums.AlertStatus;
 import henrique.igor.iiot.domain.entities.enums.Severity;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -34,6 +35,25 @@ public class Alert {
         this.triggeredAt = triggeredAt;
         this.resolvedAt = resolvedAt;
         this.sensorSnapshots = sensorSnapshots != null ? new ArrayList<>(sensorSnapshots) : new ArrayList<>();
+    }
+
+    public void acknowledge(User user) {
+        if (user == null) {
+            throw new DomainValidationException("User cannot be null to acknowledge an alert.");
+        }
+        if (this.status == AlertStatus.RESOLVED) {
+            throw new DomainValidationException("Cannot acknowledge an already resolved alert.");
+        }
+        this.acknowledgedBy = user;
+        this.status = AlertStatus.ACKNOWLEDGED;
+    }
+
+    public void dismiss() {
+        if (this.status == AlertStatus.RESOLVED) {
+            throw new DomainValidationException("Alert is already resolved.");
+        }
+        this.status = AlertStatus.RESOLVED;
+        this.resolvedAt = OffsetDateTime.now();
     }
 
     public UUID getAlertId() {return alertId;}
