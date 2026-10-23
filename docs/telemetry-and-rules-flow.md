@@ -12,19 +12,19 @@ Repare no que o `ProcessTelemetryIngestionUseCase` já faz hoje nas linhas 43–
 1. Ele percorre cada leitura (`ReadingDTO`) do pacote MQTT, busca o `Sensor` e salva no TimescaleDB (`telemetry_data`).
 2. Logo em seguida, ele atualiza a tabela `equipment_state` definindo o `HealthStatus` (`HEALTH`, `WARNING`, `CRITICAL`).
 
-**É exatamente entre o passo 1 e o passo 2 que o `EvaluateRuleGroupUseCase` entra!**
+**É exatamente entre o passo 1 e o passo 2 que o `ProcessEquipmentAnomaliesUseCase` e o `EvaluateRuleGroupUseCase` entram!**
 Quando o loop de leituras termina, nós já temos em mãos:
 - O `Equipment` (`equipmentId`)
 - Todos os valores recém-lidos mapeados por sensor: `Map<UUID, BigDecimal> sensorReadings`
 
 Nesse exato instante:
-1. Buscamos todos os grupos de regras daquele equipamento (`ruleGroupRepository.findByEquipmentId(equipmentId)`).
-2. Para cada `RuleGroup` ativo, chamamos o **`EvaluateRuleGroupUseCase.execute(...)`** passando o `Map<UUID, BigDecimal>` que acabou de chegar no payload MQTT.
+1. O `ProcessTelemetryIngestionUseCase` delega a checagem para o **`ProcessEquipmentAnomaliesUseCase`**, que busca todos os grupos de regras daquele equipamento (`ruleGroupRepository.findByEquipmentId(equipmentId)`).
+2. Para cada `RuleGroup` ativo, o `ProcessEquipmentAnomaliesUseCase` chama o **`EvaluateRuleGroupUseCase.execute(...)`** passando o `Map<UUID, BigDecimal>` que acabou de chegar no payload MQTT.
 3. **Se `result.triggered() == false`**: o equipamento continua saudável (`HealthStatus.HEALTH`).
 4. **Se `result.triggered() == true`**:
    - O status de saúde do equipamento (`equipment_state`) passa para `WARNING` ou `CRITICAL` (conforme `result.calculatedSeverity()`).
-   - Chamamos o **`TriggerAlertUseCase`** para gravar o `Alert` + `AlertSensorSnapshot` no banco.
-   - Se houver uma `AutomationRule` vinculada à condição violada, chamamos o **`ExecuteActuationCommandUseCase`** para enviar o comando ao atuador via MQTT.
+   - O `ProcessEquipmentAnomaliesUseCase` chama o **`TriggerAlertUseCase`** para gravar o `Alert` + `AlertSensorSnapshot` no banco.
+   - Se houver uma `AutomationRule` vinculada à condição violada, chama o **`ExecuteActuationCommandUseCase`** para enviar o comando ao atuador via MQTT.
 
 ---
 
@@ -41,9 +41,10 @@ flowchart TD
         ValEquip --> LoopSensors["Para cada leitura (ReadingDTO):<br/>1. Busca Sensor<br/>2. Salva TelemetryData (TimescaleDB)<br/>3. Monta Map&lt;sensorId, valor&gt;"]
     end
 
-    LoopSensors --> FetchRules["Busca RuleGroups do Equipamento"]
+    LoopSensors --> AnomalyUC["ProcessEquipmentAnomaliesUseCase.execute()"]
 
     subgraph RulesEngine ["2. Dynamic Rules Engine"]
+        AnomalyUC --> FetchRules["Busca RuleGroups ativos do Equipamento"]
         FetchRules --> Eval["EvaluateRuleGroupUseCase.execute()<br/>(Compara Map&lt;sensorId, valor&gt; com RuleConditions)"]
         Eval --> CheckOp{"Violou condições?<br/>(AND / OR)"}
     end
@@ -71,6 +72,7 @@ sequenceDiagram
     participant MQTT as Mosquitto MQTT
     participant Consumer as TelemetryMqttConsumer
     participant IngestUC as ProcessTelemetryIngestionUseCase
+    participant AnomalyUC as ProcessEquipmentAnomaliesUseCase
     participant EvalUC as EvaluateRuleGroupUseCase
     participant AlertUC as TriggerAlertUseCase
     participant AutoUC as ExecuteActuationCommandUseCase
@@ -86,25 +88,26 @@ sequenceDiagram
         Note over IngestUC: Guarda (sensorId -> valor) no Map
     end
 
-    IngestUC->>DB: Busca RuleGroups do Equipment
-    loop Para cada RuleGroup do Equipamento
-        IngestUC->>EvalUC: execute(ruleGroupId, Map<sensorId, valor>)
+    IngestUC->>AnomalyUC: execute(equipment, Map<sensorId, valor>)
+    AnomalyUC->>DB: Busca RuleGroups do Equipment
+    loop Para cada RuleGroup ativo do Equipamento
+        AnomalyUC->>EvalUC: execute(ruleGroupId, Map<sensorId, valor>)
         EvalUC->>DB: Busca RuleConditions do RuleGroup
         Note over EvalUC: Avalia operadores (>, <, =, >=, <=)<br/>e aplica lógica AND / OR
-        EvalUC-->>IngestUC: RuleEvaluationResult (triggered, severity, snapshots)
+        EvalUC-->>AnomalyUC: RuleEvaluationResult (triggered, severity, snapshots)
 
         alt Se triggered == true (Anomalia Detectada)
-            IngestUC->>AlertUC: execute(TriggerAlertInput)
+            AnomalyUC->>AlertUC: execute(TriggerAlertInput)
             AlertUC->>DB: Salva Alert (PENDING) + AlertSensorSnapshots
-            AlertUC-->>IngestUC: Alert criado
+            AlertUC-->>AnomalyUC: Alert criado
 
             opt Se houver AutomationRule ativa para a condição violada
-                IngestUC->>AutoUC: execute(ExecuteActuationCommandInput)
+                AnomalyUC->>AutoUC: execute(ExecuteActuationCommandInput)
                 AutoUC->>MQTT: Publica comando no commandMqttTopic do Atuador
             end
         end
     end
-
+    AnomalyUC-->>IngestUC: Optional<HealthStatus>
     IngestUC->>DB: Atualiza EquipmentState (HEALTH, WARNING ou CRITICAL)
 ```
 
