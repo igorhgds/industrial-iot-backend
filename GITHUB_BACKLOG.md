@@ -129,32 +129,35 @@ Repository: igorhgds/industrial-iot-backend
 ### Issue #21: [M3-US03] Master Data Use Cases (User, Sector, Gateway, Equipment, Sensor, Actuator)
 - **Type:** Feature / Backend Core
 - **Labels:** `domain`, `m3-core`
+- **Status:** Done ✅
 - **Description:**
   Implement domain business rules and application Use Cases for managing master data entities (Users, Sectors, Gateways, Equipments, Sensors, and Actuators).
 - **Acceptance Criteria:**
-  - [ ] User & Sector Use Cases (`CreateUserUseCase`, `CreateSectorUseCase`).
-  - [ ] Gateway & Equipment Use Cases (`RegisterGatewayUseCase`, `RegisterEquipmentUseCase`).
-  - [ ] Sensor & Actuator Use Cases (`RegisterSensorUseCase`, `RegisterActuatorUseCase`).
+  - [x] User & Sector Use Cases (`CreateUserUseCase`, `CreateSectorUseCase`).
+  - [x] Gateway & Equipment Use Cases (`RegisterGatewayUseCase`, `RegisterEquipmentUseCase`).
+  - [x] Sensor & Actuator Use Cases (`RegisterSensorUseCase`, `RegisterActuatorUseCase`).
 - **Definition of Done (DoD):** Pure Java domain core logic with 100% test coverage for domain validations.
 
 ### Issue #22: [M3-US04] Telemetry Ingestion & Real-Time Equipment State Use Cases
 - **Type:** Feature / Backend Core
 - **Labels:** `domain`, `m3-core`
+- **Status:** Done ✅
 - **Description:**
   Implement real-time MQTT telemetry payload ingestion, time-series persistence to TimescaleDB, instant equipment health state updates ($O(1)$), and dynamic rules evaluation trigger.
 - **Acceptance Criteria:**
-  - [ ] `ProcessTelemetryIngestionUseCase` implemented for parsing MQTT telemetry, persisting to TimescaleDB, and updating `equipment_state`.
-  - [ ] `TelemetryMqttConsumer` adapter created to receive telemetry payloads from Mosquitto MQTT broker.
+  - [x] `ProcessTelemetryIngestionUseCase` implemented for parsing MQTT telemetry, persisting to TimescaleDB, and updating `equipment_state`.
+  - [x] `TelemetryMqttConsumer` adapter created to receive telemetry payloads from Mosquitto MQTT broker.
 - **Definition of Done (DoD):** Telemetry payload stored in TimescaleDB and equipment state updated dynamically.
 
 ### Issue #23: [M3-US05] Dynamic Rules Engine, Alerts & Actuation Use Cases
 - **Type:** Feature / Backend Core
 - **Labels:** `domain`, `m3-core`
+- **Status:** Done ✅
 - **Description:**
   Implement Use Cases for dynamic threshold rule evaluation, automated anomaly alert generation (with sensor snapshot), and closed-loop actuation command dispatching.
 - **Acceptance Criteria:**
-  - [ ] `CreateRuleGroupUseCase`, `AddConditionToRuleGroupUseCase`, and `EvaluateRuleGroupUseCase` created.
-  - [ ] `TriggerAlertUseCase`, `AcknowledgeAlertUseCase`, and `ExecuteActuationCommandUseCase` implemented.
+  - [x] `CreateRuleGroupUseCase`, `AddConditionToRuleGroupUseCase`, and `EvaluateRuleGroupUseCase` created.
+  - [x] `TriggerAlertUseCase`, `AcknowledgeAlertUseCase`, `DismissAlertUseCase`, and `ExecuteActuationCommandUseCase` implemented.
 - **Definition of Done (DoD):** Anomalies trigger alerts with sensor snapshots and dispatch actuation commands.
 
 ### Issue #24: [M3-US06] Maintenance Work Order Lifecycle Use Cases
