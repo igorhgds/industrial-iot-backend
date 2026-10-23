@@ -1,0 +1,26 @@
+name: Java CI with Maven
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  unit-tests:
+    name: Run Unit Tests
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout codebase
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Run unit tests
+        run: mvn clean test --batch-mode

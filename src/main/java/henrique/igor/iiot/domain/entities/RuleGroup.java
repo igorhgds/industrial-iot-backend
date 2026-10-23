@@ -17,8 +17,8 @@ public class RuleGroup {
     private Boolean isActive;
     private final OffsetDateTime createdAt;
 
-    public RuleGroup(String name, String description, Equipment equipment, LogicalOperator operatorType, Boolean isActive){
-        this(UUID.randomUUID(), name, description, equipment, Severity.REGULAR, operatorType, isActive, OffsetDateTime.now());
+    public RuleGroup(String name, String description, Equipment equipment, LogicalOperator operatorType){
+        this(UUID.randomUUID(), name, description, equipment, Severity.REGULAR, operatorType, false, OffsetDateTime.now());
     }
 
     public RuleGroup(UUID ruleGroupId, String name, String description, Equipment equipment, Severity severity, LogicalOperator operatorType, Boolean isActive, OffsetDateTime createdAt) {
@@ -30,6 +30,29 @@ public class RuleGroup {
         this.operatorType = operatorType;
         this.isActive = isActive;
         this.createdAt = createdAt;
+    }
+
+    public void activate() {
+        this.isActive = true;
+    }
+
+    public void deactivate() {
+        this.isActive = false;
+    }
+
+    public void updateInfo(String name, String description, Severity severity, LogicalOperator operatorType) {
+        if (name != null && !name.isBlank()) {
+            this.name = name;
+        }
+        if (description != null) {
+            this.description = description;
+        }
+        if (severity != null) {
+            this.severity = severity;
+        }
+        if (operatorType != null) {
+            this.operatorType = operatorType;
+        }
     }
 
     public UUID getRuleGroupId() {return ruleGroupId;}
