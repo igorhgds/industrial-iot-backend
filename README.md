@@ -78,66 +78,7 @@ flowchart TD
     INGEST_UC -.->|"15. Real-Time Stream"| ANG
 ```
 
----
-
-## 🔄 Telemetry, Dynamic Rules & Alert Lifecycle Flow
-
-For the full Portuguese documentation and detailed diagrams, see [docs/telemetry-and-rules-flow.md](docs/telemetry-and-rules-flow.md).
-
-### End-to-End Ingestion & Rules Evaluation Sequence
-
-```mermaid
-sequenceDiagram
-    autonumber
-    participant MQTT as Mosquitto MQTT
-    participant Consumer as TelemetryMqttConsumer
-    participant IngestUC as ProcessTelemetryIngestionUseCase
-    participant AnomalyUC as ProcessEquipmentAnomaliesUseCase
-    participant EvalUC as EvaluateRuleGroupUseCase
-    participant AlertUC as TriggerAlertUseCase
-    participant AutoUC as ExecuteActuationCommandUseCase
-    participant DB as PostgreSQL / TimescaleDB
-
-    MQTT->>Consumer: JSON Payload (equipCode, gatewayCode, readings[])
-    Consumer->>IngestUC: execute(payloadDTO, rawPayload)
-
-    IngestUC->>DB: Validate Equipment & Gateway
-    loop For each ReadingDTO in payload
-        IngestUC->>DB: Find Sensor & Save TelemetryData (TimescaleDB)
-        Note over IngestUC: Collect Map<sensorId, value>
-    end
-
-    IngestUC->>AnomalyUC: execute(equipment, sensorReadings)
-    AnomalyUC->>DB: Fetch RuleGroups for Equipment
-    loop For each active RuleGroup
-        AnomalyUC->>EvalUC: execute(ruleGroupId, sensorReadings)
-        EvalUC->>DB: Fetch RuleConditions
-        Note over EvalUC: Evaluate operators (>, <, =, >=, <=)<br/>& apply logical operator (AND / OR)
-        EvalUC-->>AnomalyUC: RuleEvaluationResult (triggered, severity, snapshots)
-
-        alt If triggered == true (Anomaly Detected)
-            AnomalyUC->>AlertUC: execute(TriggerAlertInput)
-            AlertUC->>DB: Save Alert (PENDING) + AlertSensorSnapshots
-            opt If active AutomationRule exists
-                AnomalyUC->>AutoUC: execute(ExecuteActuationCommandInput)
-                AutoUC->>MQTT: Publish command to Actuator commandMqttTopic
-            end
-        end
-    end
-    AnomalyUC-->>IngestUC: Optional<HealthStatus> (HEALTH, WARNING, CRITICAL)
-    IngestUC->>DB: Save EquipmentState (O(1) current state)
-```
-
-### Alert Lifecycle State Machine
-
-```mermaid
-stateDiagram-v2
-    [*] --> PENDING: TriggerAlertUseCase (Automated via Telemetry)
-    PENDING --> ACKNOWLEDGED: AcknowledgeAlertUseCase (Operator acknowledges)
-    PENDING --> RESOLVED: DismissAlertUseCase (Direct resolution)
-    ACKNOWLEDGED --> RESOLVED: DismissAlertUseCase (Operator resolves/closes)
-    RESOLVED --> [*]
-```
+> 📖 **Detailed Workflow Diagrams:** For the step-by-step sequence diagram of telemetry ingestion, dynamic rule evaluation, and the alert lifecycle state machine, see [docs/telemetry-and-rules-flow.md](docs/telemetry-and-rules-flow.md).
 
 ---
 
