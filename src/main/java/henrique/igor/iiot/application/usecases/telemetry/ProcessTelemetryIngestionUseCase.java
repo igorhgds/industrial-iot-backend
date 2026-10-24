@@ -1,12 +1,12 @@
 package henrique.igor.iiot.application.usecases.telemetry;
 
+import henrique.igor.iiot.application.usecases.telemetry.dto.ProcessTelemetryIngestionInput;
+import henrique.igor.iiot.application.usecases.telemetry.dto.TelemetryReadingInput;
 import henrique.igor.iiot.domain.entities.*;
 import henrique.igor.iiot.domain.entities.enums.HealthStatus;
 import henrique.igor.iiot.domain.exceptions.GatewayMismatchException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.*;
-import henrique.igor.iiot.infrastructure.messaging.dto.ReadingDTO;
-import henrique.igor.iiot.infrastructure.messaging.dto.TelemetryPayloadDTO;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -39,22 +39,22 @@ public class ProcessTelemetryIngestionUseCase {
         this.processEquipmentAnomaliesUseCase = processEquipmentAnomaliesUseCase;
     }
 
-    public void execute(TelemetryPayloadDTO payloadDTO, String rawPayload) {
-        Equipment equipment = equipmentRepository.findByEquipCode(payloadDTO.equipCode())
-                .orElseThrow(() -> new ResourceNotFoundException("Equipment", payloadDTO.equipCode()));
+    public void execute(ProcessTelemetryIngestionInput input) {
+        Equipment equipment = equipmentRepository.findByEquipCode(input.equipCode())
+                .orElseThrow(() -> new ResourceNotFoundException("Equipment", input.equipCode()));
 
-        Gateway gateway = gatewayRepository.findByCode(payloadDTO.gatewayCode())
-                .orElseThrow(() -> new ResourceNotFoundException("Gateway", payloadDTO.gatewayCode()));
+        Gateway gateway = gatewayRepository.findByCode(input.gatewayCode())
+                .orElseThrow(() -> new ResourceNotFoundException("Gateway", input.gatewayCode()));
 
         if (equipment.getGateway() == null || !equipment.getGateway().getGatewayCode().equals(gateway.getGatewayCode())) {
             throw new GatewayMismatchException("Gateway does not belong to equipment");
         }
 
-        OffsetDateTime timestamp = payloadDTO.timestamp() != null ? payloadDTO.timestamp() : OffsetDateTime.now();
+        OffsetDateTime timestamp = input.timestamp() != null ? input.timestamp() : OffsetDateTime.now();
 
         Map<UUID, BigDecimal> sensorReadings = new HashMap<>();
 
-        for (ReadingDTO reading : payloadDTO.readings()) {
+        for (TelemetryReadingInput reading : input.readings()) {
             Sensor sensor = sensorRepository.findByCode(reading.sensorCode())
                     .orElseThrow(() -> new ResourceNotFoundException("Sensor", reading.sensorCode()));
 
@@ -70,6 +70,6 @@ public class ProcessTelemetryIngestionUseCase {
                 .execute(equipment, sensorReadings)
                 .orElse(existingStatus);
 
-        equipmentStateRepository.save(new EquipmentState(equipment, status, rawPayload, timestamp));
+        equipmentStateRepository.save(new EquipmentState(equipment, status, input.rawPayload(), timestamp));
     }
 }

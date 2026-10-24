@@ -1,12 +1,12 @@
 package henrique.igor.iiot.application.usecases.telemetry;
 
+import henrique.igor.iiot.application.usecases.telemetry.dto.ProcessTelemetryIngestionInput;
+import henrique.igor.iiot.application.usecases.telemetry.dto.TelemetryReadingInput;
 import henrique.igor.iiot.domain.entities.*;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.GatewayMismatchException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.*;
-import henrique.igor.iiot.infrastructure.messaging.dto.ReadingDTO;
-import henrique.igor.iiot.infrastructure.messaging.dto.TelemetryPayloadDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -55,7 +55,7 @@ class ProcessTelemetryIngestionUseCaseTest {
     private Equipment equipment;
     private Sensor voltageSensor;
     private Sensor tempSensor;
-    private TelemetryPayloadDTO payloadDTO;
+    private ProcessTelemetryIngestionInput input;
     private String rawPayload;
     private OffsetDateTime timestamp;
 
@@ -70,16 +70,17 @@ class ProcessTelemetryIngestionUseCaseTest {
         voltageSensor = new Sensor(UUID.randomUUID(), "VOL-001-MTR-USI-001", SensorType.VOLTAGE, SensorStatus.ONLINE, "V", "topic/v", equipment, OffsetDateTime.now());
         tempSensor = new Sensor(UUID.randomUUID(), "TEM-001-MTR-USI-001", SensorType.TEMPERATURE, SensorStatus.ONLINE, "C", "topic/t", equipment, OffsetDateTime.now());
 
-        List<ReadingDTO> readings = List.of(
-                new ReadingDTO("VOL-001-MTR-USI-001", new BigDecimal("380.5")),
-                new ReadingDTO("TEM-001-MTR-USI-001", new BigDecimal("65.2"))
+        List<TelemetryReadingInput> readings = List.of(
+                new TelemetryReadingInput("VOL-001-MTR-USI-001", new BigDecimal("380.5")),
+                new TelemetryReadingInput("TEM-001-MTR-USI-001", new BigDecimal("65.2"))
         );
 
-        payloadDTO = new TelemetryPayloadDTO(
+        input = new ProcessTelemetryIngestionInput(
                 "MTR-USI-001",
                 "GW-USI-001",
                 timestamp,
-                readings
+                readings,
+                rawPayload
         );
     }
 
@@ -93,7 +94,7 @@ class ProcessTelemetryIngestionUseCaseTest {
         when(equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())).thenReturn(Optional.empty());
         when(processEquipmentAnomaliesUseCase.execute(eq(equipment), any())).thenReturn(Optional.empty());
 
-        processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload);
+        processTelemetryIngestionUseCase.execute(input);
 
         verify(telemetryDataRepository, times(2)).save(any(TelemetryData.class));
 
@@ -119,7 +120,7 @@ class ProcessTelemetryIngestionUseCaseTest {
         when(equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())).thenReturn(Optional.of(existingState));
         when(processEquipmentAnomaliesUseCase.execute(eq(equipment), any())).thenReturn(Optional.empty());
 
-        processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload);
+        processTelemetryIngestionUseCase.execute(input);
 
         verify(telemetryDataRepository, times(2)).save(any(TelemetryData.class));
 
@@ -141,7 +142,7 @@ class ProcessTelemetryIngestionUseCaseTest {
         when(equipmentStateRepository.findByEquipmentId(equipment.getEquipmentId())).thenReturn(Optional.empty());
         when(processEquipmentAnomaliesUseCase.execute(eq(equipment), any())).thenReturn(Optional.of(HealthStatus.CRITICAL));
 
-        processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload);
+        processTelemetryIngestionUseCase.execute(input);
 
         ArgumentCaptor<EquipmentState> stateCaptor = ArgumentCaptor.forClass(EquipmentState.class);
         verify(equipmentStateRepository, times(1)).save(stateCaptor.capture());
@@ -155,7 +156,7 @@ class ProcessTelemetryIngestionUseCaseTest {
 
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
+                () -> processTelemetryIngestionUseCase.execute(input)
         );
 
         assertEquals("Equipment not found with identifier: MTR-USI-001", exception.getMessage());
@@ -170,7 +171,7 @@ class ProcessTelemetryIngestionUseCaseTest {
 
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
+                () -> processTelemetryIngestionUseCase.execute(input)
         );
 
         assertEquals("Gateway not found with identifier: GW-USI-001", exception.getMessage());
@@ -187,7 +188,7 @@ class ProcessTelemetryIngestionUseCaseTest {
 
         GatewayMismatchException exception = assertThrows(
                 GatewayMismatchException.class,
-                () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
+                () -> processTelemetryIngestionUseCase.execute(input)
         );
 
         assertEquals("Gateway does not belong to equipment", exception.getMessage());
@@ -203,7 +204,7 @@ class ProcessTelemetryIngestionUseCaseTest {
 
         ResourceNotFoundException exception = assertThrows(
                 ResourceNotFoundException.class,
-                () -> processTelemetryIngestionUseCase.execute(payloadDTO, rawPayload)
+                () -> processTelemetryIngestionUseCase.execute(input)
         );
 
         assertEquals("Sensor not found with identifier: VOL-001-MTR-USI-001", exception.getMessage());
