@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.entities.RuleGroup;
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
@@ -77,7 +78,7 @@ class AcknowledgeAlertUseCaseTest {
         when(alertRepository.findById(alertId)).thenReturn(Optional.of(resolvedAlert));
         when(userRepository.findById(userId)).thenReturn(Optional.of(operator));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> acknowledgeAlertUseCase.execute(new AcknowledgeAlertInput(alertId, userId)));
 
         assertEquals("Cannot acknowledge an already resolved alert.", ex.getMessage());

@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.entities.RuleCondition;
 import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.ActuatorRepository;
 import henrique.igor.iiot.domain.repositories.AutomationRuleRepository;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
@@ -64,7 +65,7 @@ public class CreateAutomationRuleUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException("Actuator", input.targetActuatorId()));
 
         if (condition.getSensor() != null && !condition.getSensor().getSensorId().equals(sensor.getSensorId())) {
-            throw new DomainValidationException("RuleCondition does not belong to the specified input sensor.");
+            throw new ResourceOwnershipMismatchException("RuleCondition does not belong to the specified input sensor.");
         }
 
         boolean active = Boolean.TRUE.equals(input.isActive());

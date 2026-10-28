@@ -6,7 +6,9 @@ import henrique.igor.iiot.domain.entities.Actuator;
 import henrique.igor.iiot.domain.entities.AutomationRule;
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.enums.*;
+import henrique.igor.iiot.domain.exceptions.ActuatorOperationException;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.ports.ActuationCommandPublisher;
 import henrique.igor.iiot.domain.repositories.AutomationRuleRepository;
@@ -70,7 +72,7 @@ class ExecuteActuationCommandUseCaseTest {
 
         when(automationRuleRepository.findById(automationId)).thenReturn(Optional.of(inactiveRule));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> executeActuationCommandUseCase.execute(new ExecuteActuationCommandInput(automationId, "STOP")));
 
         assertEquals("Cannot execute actuation command for an inactive AutomationRule.", ex.getMessage());
@@ -87,7 +89,7 @@ class ExecuteActuationCommandUseCaseTest {
 
         when(automationRuleRepository.findById(automationId)).thenReturn(Optional.of(rule));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        ActuatorOperationException ex = assertThrows(ActuatorOperationException.class,
                 () -> executeActuationCommandUseCase.execute(new ExecuteActuationCommandInput(automationId, "STOP")));
 
         assertEquals("Target actuator must be ONLINE to receive commands.", ex.getMessage());

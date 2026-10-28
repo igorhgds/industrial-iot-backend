@@ -5,6 +5,7 @@ import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.RuleGroup;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -61,7 +62,7 @@ class DismissAlertUseCaseTest {
 
         when(alertRepository.findById(alertId)).thenReturn(Optional.of(resolvedAlert));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> dismissAlertUseCase.execute(alertId));
 
         assertEquals("Alert is already resolved.", ex.getMessage());

@@ -6,6 +6,8 @@ import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.entities.WorkOrder;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidRoleAssignmentException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.UserRepository;
 import henrique.igor.iiot.domain.repositories.WorkOrderRepository;
@@ -70,7 +72,7 @@ class AssignWorkOrderUseCaseTest {
         when(workOrderRepository.findById(workOrderId)).thenReturn(Optional.of(workOrder));
         when(userRepository.findById(managerId)).thenReturn(Optional.of(manager));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidRoleAssignmentException ex = assertThrows(InvalidRoleAssignmentException.class,
                 () -> assignWorkOrderUseCase.execute(new AssignWorkOrderInput(workOrderId, managerId)));
 
         assertEquals("Assigned user must have the TECHNICIAN role.", ex.getMessage());
@@ -90,7 +92,7 @@ class AssignWorkOrderUseCaseTest {
         when(workOrderRepository.findById(workOrderId)).thenReturn(Optional.of(closedWorkOrder));
         when(userRepository.findById(technicianId)).thenReturn(Optional.of(technician));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> assignWorkOrderUseCase.execute(new AssignWorkOrderInput(workOrderId, technicianId)));
 
         assertEquals("Cannot assign a technician to a closed WorkOrder.", ex.getMessage());

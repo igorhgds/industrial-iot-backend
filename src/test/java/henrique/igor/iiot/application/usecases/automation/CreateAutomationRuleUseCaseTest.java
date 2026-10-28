@@ -5,6 +5,7 @@ import henrique.igor.iiot.domain.entities.*;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.ActuatorRepository;
 import henrique.igor.iiot.domain.repositories.AutomationRuleRepository;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
@@ -114,7 +115,7 @@ class CreateAutomationRuleUseCaseTest {
         when(ruleConditionRepository.findById(conditionId)).thenReturn(Optional.of(conditionForSensor2));
         when(actuatorRepository.findById(actuatorId)).thenReturn(Optional.of(actuator));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        ResourceOwnershipMismatchException ex = assertThrows(ResourceOwnershipMismatchException.class,
                 () -> createAutomationRuleUseCase.execute(input));
 
         assertEquals("RuleCondition does not belong to the specified input sensor.", ex.getMessage());

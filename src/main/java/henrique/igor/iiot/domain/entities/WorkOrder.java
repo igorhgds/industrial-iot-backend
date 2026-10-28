@@ -4,6 +4,8 @@ import henrique.igor.iiot.domain.entities.enums.UserRole;
 import henrique.igor.iiot.domain.entities.enums.WorkOrderPriority;
 import henrique.igor.iiot.domain.entities.enums.WorkOrderStatus;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidRoleAssignmentException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;
@@ -43,10 +45,10 @@ public class WorkOrder {
             throw new DomainValidationException("Technician user cannot be null.");
         }
         if (this.status == WorkOrderStatus.COMPLETED || this.status == WorkOrderStatus.CANCELLED) {
-            throw new DomainValidationException("Cannot assign a technician to a closed WorkOrder.");
+            throw new InvalidStateTransitionException("Cannot assign a technician to a closed WorkOrder.");
         }
         if (technician.getUserRole() != UserRole.TECHNICIAN) {
-            throw new DomainValidationException("Assigned user must have the TECHNICIAN role.");
+            throw new InvalidRoleAssignmentException("Assigned user must have the TECHNICIAN role.");
         }
         this.assignedTo = technician;
     }
@@ -56,7 +58,7 @@ public class WorkOrder {
             throw new DomainValidationException("WorkOrder status cannot be null.");
         }
         if (!isValidTransition(this.status, newStatus)) {
-            throw new DomainValidationException(
+            throw new InvalidStateTransitionException(
                     "Invalid WorkOrder status transition from " + this.status + " to " + newStatus + "."
             );
         }
@@ -68,7 +70,7 @@ public class WorkOrder {
 
     public void completeWithResolutionNotes(String resolutionNotes) {
         if (this.status == WorkOrderStatus.COMPLETED || this.status == WorkOrderStatus.CANCELLED) {
-            throw new DomainValidationException("WorkOrder is already closed.");
+            throw new InvalidStateTransitionException("WorkOrder is already closed.");
         }
         if (resolutionNotes == null || resolutionNotes.isBlank()) {
             throw new DomainValidationException("Resolution notes cannot be null or blank when closing a WorkOrder.");
