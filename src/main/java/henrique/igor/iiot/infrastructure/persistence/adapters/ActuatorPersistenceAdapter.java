@@ -7,12 +7,14 @@ import henrique.igor.iiot.infrastructure.persistence.entities.ActuatorJpaEntity;
 import henrique.igor.iiot.infrastructure.persistence.mappers.ActuatorMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.ActuatorJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Repository
+@Transactional
 public class ActuatorPersistenceAdapter implements ActuatorRepository {
 
     private static final Pattern CODE_SEQUENCE_PATTERN = Pattern.compile("^[A-Z0-9]+-(\\d+)-[A-Z0-9]+$");

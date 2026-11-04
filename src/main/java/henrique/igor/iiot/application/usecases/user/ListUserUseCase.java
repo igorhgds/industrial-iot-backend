@@ -2,7 +2,6 @@ package henrique.igor.iiot.application.usecases.user;
 
 import henrique.igor.iiot.domain.entities.User;
 import henrique.igor.iiot.domain.repositories.UserRepository;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 

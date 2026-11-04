@@ -6,10 +6,12 @@ import henrique.igor.iiot.infrastructure.persistence.entities.UserJpaEntity;
 import henrique.igor.iiot.infrastructure.persistence.mappers.UserMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.UserJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Repository
+@Transactional
 public class UserPersistenceAdapter implements UserRepository {
 
     private final UserJpaRepository userJpaRepository;

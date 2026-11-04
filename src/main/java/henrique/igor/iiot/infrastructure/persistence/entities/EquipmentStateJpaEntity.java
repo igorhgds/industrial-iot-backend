@@ -39,6 +39,7 @@ public class EquipmentStateJpaEntity {
     public EquipmentStateJpaEntity(){}
 
     public EquipmentStateJpaEntity(EquipmentJpaEntity equipment, HealthStatus status, String lastPayload, OffsetDateTime updatedAt) {
+        this.equipmentId = equipment != null ? equipment.getEquipmentId() : null;
         this.equipment = equipment;
         this.status = status;
         this.lastPayload = lastPayload;

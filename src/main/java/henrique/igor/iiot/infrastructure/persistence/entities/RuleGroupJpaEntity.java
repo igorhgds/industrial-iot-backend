@@ -41,7 +41,7 @@ public class RuleGroupJpaEntity {
     @Column(nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
-    @OneToMany(mappedBy = "ruleGroup", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "ruleGroup", fetch = FetchType.LAZY)
     private List<RuleConditionJpaEntity> conditions = new ArrayList<>();
 
     public RuleGroupJpaEntity(){}

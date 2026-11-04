@@ -6,12 +6,14 @@ import henrique.igor.iiot.infrastructure.persistence.entities.RuleConditionJpaEn
 import henrique.igor.iiot.infrastructure.persistence.mappers.RuleConditionMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.RuleConditionJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional
 public class RuleConditionPersistenceAdapter implements RuleConditionRepository {
 
     private final RuleConditionJpaRepository ruleConditionJpaRepository;

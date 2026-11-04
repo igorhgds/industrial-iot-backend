@@ -6,12 +6,14 @@ import henrique.igor.iiot.infrastructure.persistence.entities.EquipmentStateJpaE
 import henrique.igor.iiot.infrastructure.persistence.mappers.EquipmentStateMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.EquipmentStateJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional
 public class EquipmentStatePersistenceAdapter implements EquipmentStateRepository {
 
     private final EquipmentStateJpaRepository equipmentStateJpaRepository;
