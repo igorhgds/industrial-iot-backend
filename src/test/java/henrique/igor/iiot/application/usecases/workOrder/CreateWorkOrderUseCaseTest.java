@@ -4,7 +4,9 @@ import henrique.igor.iiot.application.usecases.workOrder.dto.CreateWorkOrderInpu
 import henrique.igor.iiot.domain.entities.*;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidRoleAssignmentException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
@@ -130,7 +132,7 @@ class CreateWorkOrderUseCaseTest {
         when(equipmentRepository.findById(equipmentId)).thenReturn(Optional.of(equipment));
         when(userRepository.findById(operatorId)).thenReturn(Optional.of(operator));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidRoleAssignmentException ex = assertThrows(InvalidRoleAssignmentException.class,
                 () -> createWorkOrderUseCase.execute(input));
 
         assertEquals("Assigned user must have the TECHNICIAN role.", ex.getMessage());
@@ -160,7 +162,7 @@ class CreateWorkOrderUseCaseTest {
         when(equipmentRepository.findById(equipmentId1)).thenReturn(Optional.of(equipment1));
         when(alertRepository.findById(alertId)).thenReturn(Optional.of(alertFromOtherEquip));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        ResourceOwnershipMismatchException ex = assertThrows(ResourceOwnershipMismatchException.class,
                 () -> createWorkOrderUseCase.execute(input));
 
         assertEquals("Alert does not belong to the specified Equipment.", ex.getMessage());

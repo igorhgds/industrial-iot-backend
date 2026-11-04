@@ -7,10 +7,12 @@ import henrique.igor.iiot.infrastructure.persistence.entities.EquipmentJpaEntity
 import henrique.igor.iiot.infrastructure.persistence.mappers.EquipmentMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.EquipmentJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Repository
+@Transactional
 public class EquipmentPersistenceAdapter implements EquipmentRepository {
 
     private final EquipmentJpaRepository equipmentJpaRepository;

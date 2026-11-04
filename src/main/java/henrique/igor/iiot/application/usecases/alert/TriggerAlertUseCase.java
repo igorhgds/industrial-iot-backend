@@ -6,6 +6,7 @@ import henrique.igor.iiot.domain.entities.*;
 import henrique.igor.iiot.domain.entities.enums.Severity;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
@@ -58,7 +59,7 @@ public class TriggerAlertUseCase {
 
         if (ruleGroup.getEquipment() == null ||
                 !ruleGroup.getEquipment().getEquipmentId().equals(equipment.getEquipmentId())) {
-            throw new DomainValidationException("RuleGroup does not belong to the specified Equipment.");
+            throw new ResourceOwnershipMismatchException("RuleGroup does not belong to the specified Equipment.");
         }
 
         List<AlertSensorSnapshot> snapshots = new ArrayList<>();
@@ -72,7 +73,7 @@ public class TriggerAlertUseCase {
 
             if (sensor.getEquipment() == null ||
                     !sensor.getEquipment().getEquipmentId().equals(equipment.getEquipmentId())) {
-                throw new DomainValidationException("Sensor does not belong to the same equipment as the Alert.");
+                throw new ResourceOwnershipMismatchException("Sensor does not belong to the same equipment as the Alert.");
             }
 
             snapshots.add(new AlertSensorSnapshot(sensor, snapshotInput.valueAtTrigger()));

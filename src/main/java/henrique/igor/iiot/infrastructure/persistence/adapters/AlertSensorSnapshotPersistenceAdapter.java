@@ -6,12 +6,14 @@ import henrique.igor.iiot.infrastructure.persistence.entities.AlertSensorSnapsho
 import henrique.igor.iiot.infrastructure.persistence.mappers.AlertSensorSnapshotMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.AlertSensorSnapshotJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional
 public class AlertSensorSnapshotPersistenceAdapter implements AlertSensorSnapshotRepository {
 
     private final AlertSensorSnapshotJpaRepository alertSensorSnapshotJpaRepository;

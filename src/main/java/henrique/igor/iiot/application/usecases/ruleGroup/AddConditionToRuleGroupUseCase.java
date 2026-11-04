@@ -6,6 +6,7 @@ import henrique.igor.iiot.domain.entities.RuleGroup;
 import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
@@ -52,7 +53,7 @@ public class AddConditionToRuleGroupUseCase {
         if (sensor.getEquipment() == null ||
                 ruleGroup.getEquipment() == null ||
                 !sensor.getEquipment().getEquipmentId().equals(ruleGroup.getEquipment().getEquipmentId())) {
-            throw new DomainValidationException("Sensor does not belong to the same equipment as the RuleGroup.");
+            throw new ResourceOwnershipMismatchException("Sensor does not belong to the same equipment as the RuleGroup.");
         }
 
         RuleCondition newCondition = new RuleCondition(

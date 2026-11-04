@@ -2,6 +2,7 @@ package henrique.igor.iiot.domain.services;
 
 import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.enums.ActuatorType;
+import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.repositories.ActuatorRepository;
 
 public class ActuatorCodeGenerator {
@@ -14,7 +15,7 @@ public class ActuatorCodeGenerator {
 
     public String generate(ActuatorType type, Equipment equipment) {
         if (type == null) {
-            throw new IllegalArgumentException("ActuatorType cannot be null.");
+            throw new DomainValidationException("ActuatorType cannot be null.");
         }
 
         String typePrefix = getActuatorTypePrefix(type);

@@ -6,10 +6,12 @@ import henrique.igor.iiot.infrastructure.persistence.entities.GatewayJpaEntity;
 import henrique.igor.iiot.infrastructure.persistence.mappers.GatewayMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.GatewayJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Repository
+@Transactional
 public class GatewayPersistenceAdapter implements GatewayRepository {
 
     private final GatewayJpaRepository gatewayJpaRepository;

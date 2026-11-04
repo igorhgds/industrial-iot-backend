@@ -6,6 +6,7 @@ import henrique.igor.iiot.domain.entities.Equipment;
 import henrique.igor.iiot.domain.entities.WorkOrder;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.WorkOrderRepository;
@@ -73,7 +74,7 @@ class CloseWorkOrderUseCaseTest {
 
         when(workOrderRepository.findById(workOrderId)).thenReturn(Optional.of(closedWorkOrder));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> closeWorkOrderUseCase.execute(new CloseWorkOrderInput(workOrderId, "Done")));
 
         assertEquals("WorkOrder is already closed.", ex.getMessage());

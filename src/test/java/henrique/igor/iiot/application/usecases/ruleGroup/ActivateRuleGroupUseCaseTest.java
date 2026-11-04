@@ -6,6 +6,7 @@ import henrique.igor.iiot.domain.entities.RuleGroup;
 import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
@@ -100,7 +101,7 @@ class ActivateRuleGroupUseCaseTest {
         when(ruleGroupRepository.findById(ruleGroupId)).thenReturn(Optional.of(ruleGroup));
         when(ruleConditionRepository.findByRuleGroupId(ruleGroupId)).thenReturn(Collections.emptyList());
 
-        DomainValidationException exception = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException exception = assertThrows(InvalidStateTransitionException.class,
                 () -> activateRuleGroupUseCase.execute(ruleGroupId));
 
         assertEquals("Cannot activate a RuleGroup without at least one condition.", exception.getMessage());

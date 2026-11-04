@@ -3,6 +3,7 @@ package henrique.igor.iiot.domain.entities;
 import henrique.igor.iiot.domain.entities.enums.AlertStatus;
 import henrique.igor.iiot.domain.entities.enums.Severity;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -42,7 +43,7 @@ public class Alert {
             throw new DomainValidationException("User cannot be null to acknowledge an alert.");
         }
         if (this.status == AlertStatus.RESOLVED) {
-            throw new DomainValidationException("Cannot acknowledge an already resolved alert.");
+            throw new InvalidStateTransitionException("Cannot acknowledge an already resolved alert.");
         }
         this.acknowledgedBy = user;
         this.status = AlertStatus.ACKNOWLEDGED;
@@ -50,7 +51,7 @@ public class Alert {
 
     public void dismiss() {
         if (this.status == AlertStatus.RESOLVED) {
-            throw new DomainValidationException("Alert is already resolved.");
+            throw new InvalidStateTransitionException("Alert is already resolved.");
         }
         this.status = AlertStatus.RESOLVED;
         this.resolvedAt = OffsetDateTime.now();

@@ -3,6 +3,7 @@ package henrique.igor.iiot.application.usecases.ruleGroup;
 import henrique.igor.iiot.domain.entities.RuleCondition;
 import henrique.igor.iiot.domain.entities.RuleGroup;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
@@ -33,7 +34,7 @@ public class ActivateRuleGroupUseCase {
 
         List<RuleCondition> conditions = ruleConditionRepository.findByRuleGroupId(ruleGroupId);
         if (conditions.isEmpty()) {
-            throw new DomainValidationException("Cannot activate a RuleGroup without at least one condition.");
+            throw new InvalidStateTransitionException("Cannot activate a RuleGroup without at least one condition.");
         }
 
         ruleGroup.activate();

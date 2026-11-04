@@ -16,7 +16,6 @@ import java.util.UUID;
 public class ActuatorJpaEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID actuatorId;
 
     @Column(nullable = false, unique = true)

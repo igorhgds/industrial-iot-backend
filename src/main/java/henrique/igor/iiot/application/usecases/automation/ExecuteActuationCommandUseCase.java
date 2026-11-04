@@ -5,7 +5,9 @@ import henrique.igor.iiot.application.usecases.automation.dto.ExecuteActuationCo
 import henrique.igor.iiot.domain.entities.Actuator;
 import henrique.igor.iiot.domain.entities.AutomationRule;
 import henrique.igor.iiot.domain.entities.enums.ActuatorStatus;
+import henrique.igor.iiot.domain.exceptions.ActuatorOperationException;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.ports.ActuationCommandPublisher;
 import henrique.igor.iiot.domain.repositories.AutomationRuleRepository;
@@ -37,18 +39,18 @@ public class ExecuteActuationCommandUseCase {
                 .orElseThrow(() -> new ResourceNotFoundException("AutomationRule", input.automationRuleId()));
 
         if (!Boolean.TRUE.equals(rule.getActive())) {
-            throw new DomainValidationException("Cannot execute actuation command for an inactive AutomationRule.");
+            throw new InvalidStateTransitionException("Cannot execute actuation command for an inactive AutomationRule.");
         }
 
         Actuator actuator = rule.getTargetActuator();
         if (actuator == null) {
-            throw new DomainValidationException("Target actuator is not configured for this AutomationRule.");
+            throw new ActuatorOperationException("Target actuator is not configured for this AutomationRule.");
         }
         if (actuator.getStatus() != ActuatorStatus.ONLINE) {
-            throw new DomainValidationException("Target actuator must be ONLINE to receive commands.");
+            throw new ActuatorOperationException("Target actuator must be ONLINE to receive commands.");
         }
         if (actuator.getCommandMqttTopic() == null || actuator.getCommandMqttTopic().isBlank()) {
-            throw new DomainValidationException("Target actuator does not have a valid command MQTT topic.");
+            throw new ActuatorOperationException("Target actuator does not have a valid command MQTT topic.");
         }
 
         String payload = (input.commandPayload() != null && !input.commandPayload().isBlank())
