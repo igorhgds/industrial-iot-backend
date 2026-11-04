@@ -124,7 +124,7 @@ Repository: igorhgds/industrial-iot-backend
 
 ---
 
-## ⚙️ Milestone 3: Core Domain & Clean Architecture
+## ⚙️ Milestone 3: Core Domain & Clean Architecture [STATUS: CLOSED / COMPLETED ✅]
 
 ### Issue #21: [M3-US03] Master Data Use Cases (User, Sector, Gateway, Equipment, Sensor, Actuator)
 - **Type:** Feature / Backend Core
@@ -163,12 +163,25 @@ Repository: igorhgds/industrial-iot-backend
 ### Issue #24: [M3-US06] Maintenance Work Order Lifecycle Use Cases
 - **Type:** Feature / Backend Core
 - **Labels:** `domain`, `m3-core`
+- **Status:** Done ✅
 - **Description:**
   Implement Use Cases for managing the complete lifecycle of maintenance Work Orders (Ordens de Serviço), technician assignments, and alert resolution.
 - **Acceptance Criteria:**
-  - [ ] `CreateWorkOrderUseCase` and `AssignWorkOrderUseCase` implemented.
-  - [ ] `UpdateWorkOrderStatusUseCase` and `CloseWorkOrderUseCase` enforcing state machine transitions.
+  - [x] `CreateWorkOrderUseCase` and `AssignWorkOrderUseCase` implemented.
+  - [x] `UpdateWorkOrderStatusUseCase` and `CloseWorkOrderUseCase` enforcing state machine transitions.
 - **Definition of Done (DoD):** Work Order lifecycle fully functional and validated via unit test suite.
+
+### Issue #64: [M3-US07] REST API Controllers, Web DTOs & Global Exception Handling
+- **Type:** Feature / Backend API
+- **Labels:** `domain`, `m3-core`, `observability`
+- **Status:** Done ✅
+- **Description:**
+  Implement the Inbound Web Adapter layer (`infrastructure/web/`) exposing Use Cases via RESTful HTTP endpoints (`/api/v1/*`), dedicated Request/Response Web DTOs with Bean Validation (`@Valid`), OpenAPI/Swagger specification interfaces (`specs/`), and centralized `@RestControllerAdvice` (`GlobalExceptionHandler`).
+- **Acceptance Criteria:**
+  - [x] `GlobalExceptionHandler` and `ApiErrorResponse` handling `DomainException` (`400`), `EntityNotFoundException` (`404`), `MethodArgumentNotValidException` (`400`), and unexpected errors (`500`).
+  - [x] Master Data, Operational & Automation REST Controllers implemented (`UserController`, `SectorController`, `EquipmentController`, `GatewayController`, `SensorController`, `ActuatorController`, `EquipmentStateController`, `RuleGroupController`, `AutomationRuleController`, `AlertController`, `WorkOrderController`).
+  - [x] OpenAPI 3.0 / Swagger UI (`springdoc-openapi`) enabled and organized via `*ControllerSpec` interfaces.
+- **Definition of Done (DoD):** All REST endpoints documented in Swagger UI and validated with unit & MockMvc tests.
 
 ---
 
