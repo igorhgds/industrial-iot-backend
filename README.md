@@ -55,7 +55,9 @@ flowchart TD
         FLY["✈️ Flyway Migrations (V01–V19)"]
     end
 
-    subgraph frontend_layer ["Web & Frontend Layer"]
+    subgraph web_layer ["Web & REST API Layer (Spring MVC + OpenAPI 3)"]
+        REST["🌐 REST Controllers (/api/v1/*)<br/>+ OpenAPI Specs & GlobalExceptionHandler"]
+        SWAGGER["📖 Swagger UI (/swagger-ui.html)"]
         ANG["🅰️ Angular Real-Time Dashboard (WebSockets / SSE)"]
     end
 
@@ -75,7 +77,9 @@ flowchart TD
     EVAL_UC -.->|"12. Thermal Management Rule"| HVAC
     ACT_UC -->|"13. Publish Command to commandMqttTopic"| MQTT
     HVAC -->|"14. Actuation Command"| MQTT
-    INGEST_UC -.->|"15. Real-Time Stream"| ANG
+    REST -->|"15. Invoke Application Use Cases"| backend_core
+    SWAGGER -.->|"Interactive API Docs"| REST
+    ANG -->|"16. REST + Real-Time Stream"| REST
 ```
 
 > 📖 **Detailed Workflow Diagrams:** For the step-by-step sequence diagram of telemetry ingestion, dynamic rule evaluation, and the alert lifecycle state machine, see [docs/telemetry-and-rules-flow.md](docs/telemetry-and-rules-flow.md).
@@ -90,22 +94,48 @@ We follow an iterative milestone roadmap. Documented below is our current develo
 | :--- | :--- | :---: |
 | **Milestone 1** | **Infra & Ingestion Pipeline:** Docker Compose setup (TimescaleDB, Mosquitto, RabbitMQ) + Python Motor Simulator | COMPLETED ✅ |
 | **Milestone 2** | **Database & Data Modeling:** TimescaleDB Hypertables, 3-Tier Schema (Config/State/History), Flyway Migrations | COMPLETED ✅ |
-| **Milestone 3** | **Core Domain & Clean Architecture:** Pure Java Domain Entities, JPA Entities & Mappers, Rules Engine, Async Consumers | IN PROGRESS ⏳ |
+| **Milestone 3** | **Core Domain, Clean Architecture & REST API:** Pure Java Domain Entities, Use Cases, Rules Engine, Async MQTT Consumers, REST Controllers, OpenAPI Specs & Global Exception Handling | COMPLETED ✅ |
 | **Milestone 4** | **Frontend Integration & Real-Time:** Angular Dashboard, RxJS State, WebSockets / SSE streaming | PLANNED 📋 |
 | **Milestone 5** | **Actuation & Feedback Loop:** Bi-directional MQTT commands (Emergency stop, speed throttling) | PLANNED 📋 |
 | **Milestone 6** | **HVAC Control & Thermal Module:** Native internal HVAC thermal management engine | PLANNED 📋 |
-| **Milestone 7** | **Enterprise Security & Observability:** Spring Security (JWT), Actuator metrics, Swagger / OpenAPI | PLANNED 📋 |
+| **Milestone 7** | **Enterprise Security & Observability:** Spring Security (JWT), Actuator metrics | PLANNED 📋 |
 
 ---
 
 ## ⚡ Tech Stack
 
-- **Core Backend:** Java 21 LTS, Spring Boot 4.1.x, Spring Data JPA, Flyway DB
+- **Core Backend:** Java 21 LTS, Spring Boot 4.1.x, Spring Web MVC, Spring Data JPA, Jakarta Bean Validation, Flyway DB
+- **API Documentation:** SpringDoc OpenAPI 3 / Swagger UI (`specs/` interface-driven documentation)
 - **Messaging Brokers:** Eclipse Mosquitto v2 (MQTT / WebSockets), RabbitMQ 3.13 (AMQP)
 - **Database:** PostgreSQL 16 + **TimescaleDB** (Timescale Hypertable time-series storage)
 - **IoT Simulators:** Python 3.10+, Paho-MQTT 2.x
+- **Testing:** JUnit 5, Mockito, Spring MockMvc (174 unit & controller tests)
 - **Frontend (Upcoming):** Angular, RxJS, Chart.js / ngx-charts
 - **DevOps & Tools:** Docker, Docker Compose, Git, Linux Mint
+
+---
+
+## 🌐 REST API Endpoints & OpenAPI (Swagger UI)
+
+Once the backend is running, interactive API documentation is available at:
+- **Swagger UI:** `http://localhost:8080/swagger-ui.html`
+- **OpenAPI JSON Spec:** `http://localhost:8080/v3/api-docs`
+
+All OpenAPI annotations are decoupled from the controller classes via dedicated `*ControllerSpec` interfaces in `infrastructure/web/specs/`, and domain exceptions are translated into standardized `ApiErrorResponse` payloads (`400`, `404`, `409`, `422`) by `GlobalExceptionHandler`.
+
+| Resource Tag | Base Path | Key Operations |
+| :--- | :--- | :--- |
+| **Users** | `/api/v1/users` | `POST` create user, `GET` list all, `GET /{id}` get by ID, `PUT /{id}` update profile/role/sector |
+| **Sectors** | `/api/v1/sectors` | `POST` create sector, `GET` list all, `PUT /{id}` update sector |
+| **Gateways** | `/api/v1/gateways` | `POST` register gateway (auto-code), `GET /sector/{sectorId}` list by sector, `PUT /{id}` update gateway |
+| **Equipments** | `/api/v1/equipments` | `POST` register equipment (auto-code), `GET /{id}` get details, `PUT /{id}` update status/sector/gateway |
+| **Equipment States** | `/api/v1/equipment-states` | `GET` list all $O(1)$ health states, `GET /{equipmentId}` get current health state & latest payload |
+| **Sensors** | `/api/v1/sensors` | `POST` register sensor (auto-code), `GET /equipment/{equipmentId}` list by equipment, `PUT /{id}` update sensor |
+| **Actuators** | `/api/v1/actuators` | `POST` register actuator (auto-code), `PUT /{id}` update status/topics/equipment |
+| **Rule Groups** | `/api/v1/rule-groups` | `POST` create group, `GET /equipment/{equipmentId}`, `PUT /{id}`, `PATCH /{id}/activate`, `POST /{id}/conditions` |
+| **Automation Rules** | `/api/v1/automation-rules` | `POST` create closed-loop rule, `PATCH /{id}/toggle`, `POST /{id}/execute` dispatch MQTT command |
+| **Alerts** | `/api/v1/alerts` | `GET` list alerts (filter by equipment/status), `POST` trigger alert, `PATCH /{id}/acknowledge`, `PATCH /{id}/dismiss` |
+| **Work Orders** | `/api/v1/work-orders` | `POST` create O.S., `PATCH /{id}/assign`, `PATCH /{id}/status`, `PATCH /{id}/close`, `GET /{id}/sheet` printable sheet |
 
 
 ---
@@ -213,13 +243,16 @@ industrial-iot-backend/
 ├── src/                         # Spring Boot application source code
 │   ├── main/
 │   │   ├── java/henrique/igor/iiot/
-│   │   │   ├── application/usecases/ # Clean Architecture Use Cases & DTOs
-│   │   │   ├── domain/               # Pure Java Entities, Enums, Exceptions, Ports & Repo Interfaces
-│   │   │   └── infrastructure/       # Messaging (MQTT), Persistence (JPA Entities, Mappers, Adapters)
+│   │   │   ├── application/usecases/ # Clean Architecture Use Cases & Input/Output DTOs
+│   │   │   ├── domain/               # Pure Java Entities, Enums, Exceptions, Services, Ports & Repo Interfaces
+│   │   │   └── infrastructure/
+│   │   │       ├── messaging/        # MQTT Consumer, Publisher Adapter & UseCase ComponentScan Config
+│   │   │       ├── persistence/      # JPA Entities, Mappers, Spring Data Repositories & Adapters
+│   │   │       └── web/              # REST Controllers, Request/Response DTOs, OpenAPI Specs & GlobalExceptionHandler
 │   │   └── resources/
 │   │       ├── application.yaml      # Spring Boot configurations
 │   │       └── db/migration/         # Flyway SQL migration scripts (V01–V19)
-│   └── test/                         # JUnit 5 & Mockito unit test suites
+│   └── test/                         # JUnit 5, Mockito & MockMvc test suites (174 tests)
 └── pom.xml                      # Maven dependencies & build setup
 ```
 
