@@ -8,6 +8,7 @@ import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
 import henrique.igor.iiot.domain.repositories.SensorRepository;
@@ -222,7 +223,7 @@ class AddConditionToRuleGroupUseCaseTest {
         when(ruleGroupRepository.findById(ruleGroupId)).thenReturn(Optional.of(ruleGroup));
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(sensor));
 
-        DomainValidationException exception = assertThrows(DomainValidationException.class,
+        ResourceOwnershipMismatchException exception = assertThrows(ResourceOwnershipMismatchException.class,
                 () -> addConditionToRuleGroupUseCase.execute(request));
 
         assertEquals("Sensor does not belong to the same equipment as the RuleGroup.", exception.getMessage());

@@ -7,10 +7,12 @@ import henrique.igor.iiot.infrastructure.persistence.entities.SensorJpaEntity;
 import henrique.igor.iiot.infrastructure.persistence.mappers.SensorMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.SensorJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 @Repository
+@Transactional
 public class SensorPersistenceAdapter implements SensorRepository {
 
     private final SensorJpaRepository sensorJpaRepository;

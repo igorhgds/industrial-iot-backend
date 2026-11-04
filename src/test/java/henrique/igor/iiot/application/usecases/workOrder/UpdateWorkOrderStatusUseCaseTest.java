@@ -8,6 +8,7 @@ import henrique.igor.iiot.domain.entities.enums.EquipType;
 import henrique.igor.iiot.domain.entities.enums.WorkOrderPriority;
 import henrique.igor.iiot.domain.entities.enums.WorkOrderStatus;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.WorkOrderRepository;
 import org.junit.jupiter.api.DisplayName;
@@ -64,7 +65,7 @@ class UpdateWorkOrderStatusUseCaseTest {
 
         when(workOrderRepository.findById(workOrderId)).thenReturn(Optional.of(completedWorkOrder));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> updateWorkOrderStatusUseCase.execute(new UpdateWorkOrderStatusInput(workOrderId, WorkOrderStatus.OPEN)));
 
         assertEquals("Invalid WorkOrder status transition from COMPLETED to OPEN.", ex.getMessage());
@@ -80,7 +81,7 @@ class UpdateWorkOrderStatusUseCaseTest {
 
         when(workOrderRepository.findById(workOrderId)).thenReturn(Optional.of(openWorkOrder));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        InvalidStateTransitionException ex = assertThrows(InvalidStateTransitionException.class,
                 () -> updateWorkOrderStatusUseCase.execute(new UpdateWorkOrderStatusInput(workOrderId, WorkOrderStatus.COMPLETED)));
 
         assertEquals("Invalid WorkOrder status transition from OPEN to COMPLETED.", ex.getMessage());

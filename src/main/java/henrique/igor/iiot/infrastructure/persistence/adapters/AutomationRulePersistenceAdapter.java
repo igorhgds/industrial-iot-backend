@@ -6,12 +6,14 @@ import henrique.igor.iiot.infrastructure.persistence.entities.AutomationRuleJpaE
 import henrique.igor.iiot.infrastructure.persistence.mappers.AutomationRuleMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.AutomationRuleJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional
 public class AutomationRulePersistenceAdapter implements AutomationRuleRepository {
 
     private final AutomationRuleJpaRepository automationRuleJpaRepository;

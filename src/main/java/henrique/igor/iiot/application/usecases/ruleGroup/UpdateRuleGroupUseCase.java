@@ -4,6 +4,7 @@ import henrique.igor.iiot.application.usecases.ruleGroup.dto.UpdateRuleGroupInpu
 import henrique.igor.iiot.domain.entities.RuleCondition;
 import henrique.igor.iiot.domain.entities.RuleGroup;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
+import henrique.igor.iiot.domain.exceptions.InvalidStateTransitionException;
 import henrique.igor.iiot.domain.exceptions.ResourceAlreadyExistsException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.repositories.RuleConditionRepository;
@@ -53,7 +54,7 @@ public class UpdateRuleGroupUseCase {
             if (input.isActive()) {
                 List<RuleCondition> conditions = ruleConditionRepository.findByRuleGroupId(input.ruleGroupId());
                 if (conditions.isEmpty()) {
-                    throw new DomainValidationException("Cannot activate a RuleGroup without at least one condition.");
+                    throw new InvalidStateTransitionException("Cannot activate a RuleGroup without at least one condition.");
                 }
                 existingRuleGroup.activate();
             } else {

@@ -9,6 +9,7 @@ import henrique.igor.iiot.domain.entities.Sensor;
 import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
@@ -129,7 +130,7 @@ class TriggerAlertUseCaseTest {
         when(equipmentRepository.findById(equipmentId1)).thenReturn(Optional.of(equipment1));
         when(ruleGroupRepository.findById(ruleGroupId)).thenReturn(Optional.of(ruleGroup));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        ResourceOwnershipMismatchException ex = assertThrows(ResourceOwnershipMismatchException.class,
                 () -> triggerAlertUseCase.execute(input));
 
         assertEquals("RuleGroup does not belong to the specified Equipment.", ex.getMessage());
@@ -161,7 +162,7 @@ class TriggerAlertUseCaseTest {
         when(ruleGroupRepository.findById(ruleGroupId)).thenReturn(Optional.of(ruleGroup));
         when(sensorRepository.findById(sensorId)).thenReturn(Optional.of(sensorFromOtherEquip));
 
-        DomainValidationException ex = assertThrows(DomainValidationException.class,
+        ResourceOwnershipMismatchException ex = assertThrows(ResourceOwnershipMismatchException.class,
                 () -> triggerAlertUseCase.execute(input));
 
         assertEquals("Sensor does not belong to the same equipment as the Alert.", ex.getMessage());

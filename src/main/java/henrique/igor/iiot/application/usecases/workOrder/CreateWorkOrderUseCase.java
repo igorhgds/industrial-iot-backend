@@ -9,6 +9,7 @@ import henrique.igor.iiot.domain.entities.enums.Severity;
 import henrique.igor.iiot.domain.entities.enums.WorkOrderPriority;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
+import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
@@ -54,7 +55,7 @@ public class CreateWorkOrderUseCase {
 
             if (alert.getEquipment() == null ||
                     !alert.getEquipment().getEquipmentId().equals(equipment.getEquipmentId())) {
-                throw new DomainValidationException("Alert does not belong to the specified Equipment.");
+                throw new ResourceOwnershipMismatchException("Alert does not belong to the specified Equipment.");
             }
         }
 

@@ -6,6 +6,7 @@ import henrique.igor.iiot.infrastructure.persistence.entities.TelemetryDataJpaEn
 import henrique.igor.iiot.infrastructure.persistence.mappers.TelemetryDataMapper;
 import henrique.igor.iiot.infrastructure.persistence.repositories.jpa.TelemetryDataJpaRepository;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
+@Transactional
 public class TelemetryDataPersistenceAdapter implements TelemetryDataRepository {
 
     private final TelemetryDataJpaRepository telemetryDataJpaRepository;
