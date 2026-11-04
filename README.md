@@ -21,7 +21,7 @@ An **Industry 4.0 Industrial IoT (IIoT)** backend platform built for real-time e
   2. *Current State & Operational:* Fast $O(1)$ equipment status lookup (`equipment_state`), multi-sensor alert snapshots (`alerts`, `alert_sensor_snapshots`), and maintenance work orders (`work_orders`).
   3. *Historical Stream:* TimescaleDB Hypertable (`telemetry_data`) for high-throughput time-series telemetry scale.
 - **Clean & Hexagonal Architecture:** Strict Separation of Concerns. Core domain business logic is decoupled from frameworks, ensuring testability and longevity.
-- **Quality Assurance & Verification:** Comprehensive unit and integration test coverage using JUnit 5, Mockito, and Testcontainers.
+- **Quality Assurance & Verification:** Comprehensive unit and web layer test coverage using JUnit 5, Mockito, and Spring MockMvc.
 - **Container-First Environment:** 100% conteinerized local environment managed via Docker Compose.
 
 ---
@@ -260,7 +260,7 @@ industrial-iot-backend/
 
 ## 📜 Backlog & Sprint Tracking
 
-For a complete breakdown of user stories, acceptance criteria, and issue specifications, refer to [GITHUB_BACKLOG.md](file:///media/igor/Projetos/00%20-%20Web%20Developer/01%20-%20Projetos/Industrial_IoT/industrial-iot-backend/GITHUB_BACKLOG.md) or visit our [GitHub Project Board](https://github.com/users/igorhgds/projects/5).
+For a complete breakdown of user stories, acceptance criteria, and issue specifications, refer to [GITHUB_BACKLOG.md](GITHUB_BACKLOG.md) or visit our [GitHub Project Board](https://github.com/users/igorhgds/projects/5).
 
 ---
 
