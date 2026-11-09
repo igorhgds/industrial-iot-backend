@@ -13,6 +13,25 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_DEFAULT_USER:iiot}
+    password: ${RABBITMQ_DEFAULT_PASS:iiot}
+
+rabbitmq:
+  exchange:
+    events: ${RABBITMQ_EVENTS_EXCHANGE:iiot.events.exchange}
+    dlx: ${RABBITMQ_DLX_EXCHANGE:iiot.events.dlx}
+  queue:
+    critical-alerts: ${RABBITMQ_CRITICAL_ALERTS_QUEUE:iiot.alerts.critical.queue}
+    work-orders: ${RABBITMQ_WORK_ORDERS_QUEUE:iiot.workorders.queue}
+    dlq: ${RABBITMQ_DLQ_QUEUE:iiot.events.dlq}
+  routing-key:
+    critical-alert: ${RABBITMQ_CRITICAL_ALERT_ROUTING_KEY:alert.critical}
+    alert-prefix: ${RABBITMQ_ALERT_ROUTING_KEY_PREFIX:alert.}
+    work-order-created: ${RABBITMQ_WORK_ORDER_ROUTING_KEY:workorder.created}
+    dlq: ${RABBITMQ_DLQ_ROUTING_KEY:events.dlq}
 
 mqtt:
   broker:

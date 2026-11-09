@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.InvalidRoleAssignmentException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
+import henrique.igor.iiot.domain.ports.WorkOrderEventPublisher;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
@@ -42,6 +43,9 @@ class CreateWorkOrderUseCaseTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private WorkOrderEventPublisher workOrderEventPublisher;
+
     @InjectMocks
     private CreateWorkOrderUseCase createWorkOrderUseCase;
 
@@ -75,6 +79,7 @@ class CreateWorkOrderUseCaseTest {
         assertNull(result.getAssignedTo());
 
         verify(workOrderRepository, times(1)).save(any(WorkOrder.class));
+        verify(workOrderEventPublisher, times(1)).publishWorkOrderCreated(result);
     }
 
     @Test
