@@ -10,6 +10,7 @@ import henrique.igor.iiot.domain.entities.enums.*;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
+import henrique.igor.iiot.domain.ports.AlertEventPublisher;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
@@ -46,6 +47,9 @@ class TriggerAlertUseCaseTest {
 
     @Mock
     private SensorRepository sensorRepository;
+
+    @Mock
+    private AlertEventPublisher alertEventPublisher;
 
     @InjectMocks
     private TriggerAlertUseCase triggerAlertUseCase;
@@ -87,6 +91,7 @@ class TriggerAlertUseCaseTest {
         assertEquals(new BigDecimal("96.4"), result.getSensorSnapshots().get(0).getValueAtTrigger());
 
         verify(alertRepository, times(1)).save(any(Alert.class));
+        verify(alertEventPublisher, times(1)).publishAlertTriggered(result);
     }
 
     @Test
