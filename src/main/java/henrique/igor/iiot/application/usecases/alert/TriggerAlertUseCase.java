@@ -7,6 +7,7 @@ import henrique.igor.iiot.domain.entities.enums.Severity;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
+import henrique.igor.iiot.domain.ports.AlertEventPublisher;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.RuleGroupRepository;
@@ -21,17 +22,20 @@ public class TriggerAlertUseCase {
     private final EquipmentRepository equipmentRepository;
     private final RuleGroupRepository ruleGroupRepository;
     private final SensorRepository sensorRepository;
+    private final AlertEventPublisher alertEventPublisher;
 
     public TriggerAlertUseCase(
             AlertRepository alertRepository,
             EquipmentRepository equipmentRepository,
             RuleGroupRepository ruleGroupRepository,
-            SensorRepository sensorRepository
+            SensorRepository sensorRepository,
+            AlertEventPublisher alertEventPublisher
     ) {
         this.alertRepository = alertRepository;
         this.equipmentRepository = equipmentRepository;
         this.ruleGroupRepository = ruleGroupRepository;
         this.sensorRepository = sensorRepository;
+        this.alertEventPublisher = alertEventPublisher;
     }
 
     public Alert execute(TriggerAlertInput input) {
@@ -89,7 +93,9 @@ public class TriggerAlertUseCase {
                 snapshots
         );
 
-        return alertRepository.save(alert);
+        Alert savedAlert = alertRepository.save(alert);
+        alertEventPublisher.publishAlertTriggered(savedAlert);
+        return savedAlert;
     }
 
     private Severity resolveSeverity(Severity inputSeverity, Severity ruleGroupSeverity) {

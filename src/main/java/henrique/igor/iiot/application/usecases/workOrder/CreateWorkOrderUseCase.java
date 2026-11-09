@@ -10,6 +10,7 @@ import henrique.igor.iiot.domain.entities.enums.WorkOrderPriority;
 import henrique.igor.iiot.domain.exceptions.DomainValidationException;
 import henrique.igor.iiot.domain.exceptions.ResourceNotFoundException;
 import henrique.igor.iiot.domain.exceptions.ResourceOwnershipMismatchException;
+import henrique.igor.iiot.domain.ports.WorkOrderEventPublisher;
 import henrique.igor.iiot.domain.repositories.AlertRepository;
 import henrique.igor.iiot.domain.repositories.EquipmentRepository;
 import henrique.igor.iiot.domain.repositories.UserRepository;
@@ -21,17 +22,20 @@ public class CreateWorkOrderUseCase {
     private final EquipmentRepository equipmentRepository;
     private final AlertRepository alertRepository;
     private final UserRepository userRepository;
+    private final WorkOrderEventPublisher workOrderEventPublisher;
 
     public CreateWorkOrderUseCase(
             WorkOrderRepository workOrderRepository,
             EquipmentRepository equipmentRepository,
             AlertRepository alertRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            WorkOrderEventPublisher workOrderEventPublisher
     ) {
         this.workOrderRepository = workOrderRepository;
         this.equipmentRepository = equipmentRepository;
         this.alertRepository = alertRepository;
         this.userRepository = userRepository;
+        this.workOrderEventPublisher = workOrderEventPublisher;
     }
 
     public WorkOrder execute(CreateWorkOrderInput input) {
@@ -76,7 +80,9 @@ public class CreateWorkOrderUseCase {
             workOrder.assignToTechnician(technician);
         }
 
-        return workOrderRepository.save(workOrder);
+        WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
+        workOrderEventPublisher.publishWorkOrderCreated(savedWorkOrder);
+        return savedWorkOrder;
     }
 
     private WorkOrderPriority resolvePriority(WorkOrderPriority inputPriority, Alert alert) {
